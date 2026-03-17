@@ -1,0 +1,155 @@
+---
+import '../styles/global.css';
+import '../styles/visualizer.css';
+import Navigator from '../components/Navigator.astro';
+import SlideContainer from '../components/SlideContainer.astro';
+import SmallScreenWarning from '../components/SmallScreenWarning.astro';
+import SlideLanding from '../components/slides/SlideLanding.astro';
+import Slide01Intro from '../components/slides/Slide01Intro.astro';
+import Slide02SingleThread from '../components/slides/Slide02SingleThread.astro';
+import Slide03CallStack from '../components/slides/Slide03CallStack.astro';
+import Slide04WebAPIs from '../components/slides/Slide04WebAPIs.astro';
+import Slide05CallbackQueue from '../components/slides/Slide05CallbackQueue.astro';
+import Slide06MicrotaskQueue from '../components/slides/Slide06MicrotaskQueue.astro';
+import Slide07Visualizer from '../components/slides/Slide07Visualizer.astro';
+import Slide08Summary from '../components/slides/Slide08Summary.astro';
+import EventLoopVisualizer from '../components/EventLoopVisualizer.astro';
+import Narrator from '../components/Narrator.astro';
+import PlaybackControls from '../components/PlaybackControls.astro';
+import CodePlayground from '../components/CodePlayground.astro';
+import SlideWW01Intro from '../components/slides/SlideWW01Intro.astro';
+import SlideWW02BlockedThread from '../components/slides/SlideWW02BlockedThread.astro';
+import SlideWW03Threads from '../components/slides/SlideWW03Threads.astro';
+import SlideWW04Messages from '../components/slides/SlideWW04Messages.astro';
+import SlideWW05UseCases from '../components/slides/SlideWW05UseCases.astro';
+import SlideWW06Visualizer from '../components/slides/SlideWW06Visualizer.astro';
+import SlideWW07Summary from '../components/slides/SlideWW07Summary.astro';
+
+const TOTAL_SLIDES = 16;
+---
+
+<html lang="es" style="height: 100%">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Asíncrono</title>
+  </head>
+  <body>
+    <SmallScreenWarning />
+    <Navigator currentIndex={0} total={TOTAL_SLIDES} />
+
+    <main class="presentation">
+      <SlideContainer>
+        <div data-slide-index="0">
+          <SlideLanding />
+        </div>
+
+        <div data-slide-index="1">
+          <Slide01Intro />
+        </div>
+
+        <div data-slide-index="2">
+          <Slide02SingleThread />
+        </div>
+
+        <div data-slide-index="3">
+          <Slide03CallStack />
+        </div>
+
+        <div data-slide-index="4">
+          <Slide04WebAPIs />
+        </div>
+
+        <div data-slide-index="5">
+          <Slide05CallbackQueue />
+        </div>
+
+        <div data-slide-index="6">
+          <Slide06MicrotaskQueue />
+        </div>
+
+        <div data-slide-index="7">
+          <Slide07Visualizer>
+            <div class="visualizer-layout">
+              <div class="visualizer-left">
+                <EventLoopVisualizer />
+                <PlaybackControls />
+              </div>
+              <div class="visualizer-right">
+                <CodePlayground />
+                <Narrator />
+              </div>
+            </div>
+          </Slide07Visualizer>
+        </div>
+
+        <div data-slide-index="8">
+          <Slide08Summary />
+        </div>
+
+        <div data-slide-index="9">
+          <SlideWW01Intro />
+        </div>
+
+        <div data-slide-index="10">
+          <SlideWW02BlockedThread />
+        </div>
+
+        <div data-slide-index="11">
+          <SlideWW03Threads />
+        </div>
+
+        <div data-slide-index="12">
+          <SlideWW04Messages />
+        </div>
+
+        <div data-slide-index="13">
+          <SlideWW05UseCases />
+        </div>
+
+        <div data-slide-index="14">
+          <SlideWW06Visualizer />
+        </div>
+
+        <div data-slide-index="15">
+          <SlideWW07Summary />
+        </div>
+      </SlideContainer>
+    </main>
+  </body>
+</html>
+
+<style>
+  .presentation {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  @media (max-width: 767px) {
+    .presentation {
+      display: none;
+    }
+  }
+
+  .visualizer-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    width: 100%;
+    align-items: start;
+  }
+
+  .visualizer-left,
+  .visualizer-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  @media (max-width: 1024px) {
+    .visualizer-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+// SlideContainer.astro
+// Escucha slide:change y activa la diapositiva correspondiente
+---
+
+<div class="slide-container" id="slide-container">
+  <slot />
+</div>
+
+<script>
+  (function () {
+    const container = document.getElementById('slide-container') as HTMLElement;
+    if (!container) return;
+
+    function getSlides(): NodeListOf<HTMLElement> {
+      return container.querySelectorAll<HTMLElement>('[data-slide-index]');
+    }
+
+    function activateSlide(targetIndex: number) {
+      const slides = getSlides();
+      slides.forEach((slide) => {
+        const idx = parseInt(slide.dataset.slideIndex ?? '0', 10);
+        if (idx === targetIndex) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+    }
+
+    // Activar la primera diapositiva al cargar
+    activateSlide(0);
+
+    document.addEventListener('slide:change', (e: Event) => {
+      const detail = (e as CustomEvent<{ index: number }>).detail;
+      activateSlide(detail.index);
+    });
+  })();
+</script>
+
+<style>
+  .slide-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Deja espacio para el Navigator fijo en la parte inferior (~64px) */
+    bottom: 64px;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /*
+   * Todas las diapositivas hijas con data-slide-index están ocultas por defecto.
+   * Se usa display: none (no visibility: hidden) para no consumir recursos.
+   */
+  .slide-container :global([data-slide-index]) {
+    display: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Diapositiva activa: flex centrado + fade-in de 300ms */
+  .slide-container :global([data-slide-index].active) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: slide-fade-in 300ms ease forwards;
+  }
+
+  @keyframes slide-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>

@@ -1,0 +1,213 @@
+---
+import SectionCard from '../SectionCard.astro';
+---
+
+<section class="slide slide-landing">
+  <div class="landing-content">
+    <div class="landing-header">
+      <h1 class="landing-title">JavaScript Asíncrono</h1>
+      <p class="landing-subtitle">Dos modelos para ejecutar tareas sin bloquear la interfaz de usuario</p>
+    </div>
+
+    <!-- Distinción conceptual -->
+    <div class="concept-comparison" aria-label="Comparación de enfoques">
+      <div class="concept-item">
+        <div class="concept-diagram concurrency-diagram" aria-hidden="true">
+          <div class="thread-row">
+            <span class="thread-label">Hilo</span>
+            <div class="task-blocks">
+              <span class="task-block task-a">A</span>
+              <span class="task-block task-b">B</span>
+              <span class="task-block task-a">A</span>
+              <span class="task-block task-b">B</span>
+              <span class="task-block task-a">A</span>
+            </div>
+          </div>
+        </div>
+        <p class="concept-label">Concurrencia — un hilo, tareas intercaladas</p>
+      </div>
+
+      <div class="concept-divider" aria-hidden="true">vs</div>
+
+      <div class="concept-item">
+        <div class="concept-diagram parallelism-diagram" aria-hidden="true">
+          <div class="thread-row">
+            <span class="thread-label">Hilo 1</span>
+            <div class="task-blocks">
+              <span class="task-block task-a">A</span>
+              <span class="task-block task-a">A</span>
+              <span class="task-block task-a">A</span>
+            </div>
+          </div>
+          <div class="thread-row">
+            <span class="thread-label">Hilo 2</span>
+            <div class="task-blocks">
+              <span class="task-block task-b">B</span>
+              <span class="task-block task-b">B</span>
+              <span class="task-block task-b">B</span>
+            </div>
+          </div>
+        </div>
+        <p class="concept-label">Paralelismo — múltiples hilos, tareas simultáneas</p>
+      </div>
+    </div>
+
+    <!-- Cards de sección -->
+    <div class="cards-row">
+      <SectionCard
+        title="Event Loop"
+        description="Concurrencia cooperativa en un solo hilo. Aprende cómo JavaScript gestiona tareas asíncronas con el Call Stack, Web APIs, Callback Queue y Microtask Queue."
+        targetIndex={1}
+        accentColor="var(--color-accent)"
+        ariaLabel="Ir a la sección Event Loop"
+      />
+      <SectionCard
+        title="Web Workers"
+        description="Paralelismo real con múltiples hilos. Descubre cómo ejecutar código CPU-intensivo en segundo plano sin bloquear la interfaz de usuario."
+        targetIndex={9}
+        accentColor="var(--color-worker-thread, #F472B6)"
+        ariaLabel="Ir a la sección Web Workers"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .slide-landing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 30%, #1a1a3a 0%, var(--color-bg) 70%);
+    overflow-y: auto;
+  }
+
+  .landing-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-10) var(--space-8);
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .landing-header {
+    text-align: center;
+  }
+
+  .landing-title {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, #38BDF8, #F472B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: var(--space-3);
+  }
+
+  .landing-subtitle {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  /* ── Comparación conceptual ── */
+  .concept-comparison {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-8);
+    width: 100%;
+  }
+
+  .concept-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .concept-divider {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  .concept-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .thread-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .thread-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    min-width: 3.5rem;
+    flex-shrink: 0;
+  }
+
+  .task-blocks {
+    display: flex;
+    gap: 3px;
+  }
+
+  .task-block {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 20px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+
+  .task-a {
+    background: rgba(56, 189, 248, 0.2);
+    border: 1px solid #38BDF8;
+    color: #38BDF8;
+  }
+
+  .task-b {
+    background: rgba(244, 114, 182, 0.2);
+    border: 1px solid #F472B6;
+    color: #F472B6;
+  }
+
+  .concept-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* ── Cards ── */
+  .cards-row {
+    display: flex;
+    gap: var(--space-6);
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cards-row :global(.section-card) {
+    flex: 1;
+    max-width: 380px;
+  }
+</style>

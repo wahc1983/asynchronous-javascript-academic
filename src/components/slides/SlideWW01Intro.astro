@@ -1,0 +1,311 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-ww01">
+  <div class="content">
+    <h2 class="title">¿Qué es un Web Worker?</h2>
+
+    <div class="main-grid">
+      <div class="svg-box">
+        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg"
+             aria-label="Diagrama de un Web Worker corriendo en paralelo al hilo principal">
+          <defs>
+            <marker id="ww01-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#38BDF8"/>
+            </marker>
+            <marker id="ww01-arrow-pink" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#F472B6"/>
+            </marker>
+          </defs>
+
+          <!-- Navegador (contenedor) -->
+          <rect x="10" y="10" width="300" height="180" rx="10" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+          <text x="160" y="28" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600">NAVEGADOR</text>
+
+          <!-- Main Thread -->
+          <rect x="25" y="38" width="120" height="140" rx="7" fill="#0C2A3F" stroke="#38BDF8" stroke-width="2"/>
+          <text x="85" y="56" text-anchor="middle" fill="#38BDF8" font-size="9" font-weight="700">MAIN THREAD</text>
+          <rect x="35" y="64" width="100" height="18" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1"/>
+          <text x="85" y="77" text-anchor="middle" fill="#93C5FD" font-size="8" font-family="monospace">DOM</text>
+          <rect x="35" y="88" width="100" height="18" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1"/>
+          <text x="85" y="101" text-anchor="middle" fill="#93C5FD" font-size="8" font-family="monospace">UI Events</text>
+          <rect x="35" y="112" width="100" height="18" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1"/>
+          <text x="85" y="125" text-anchor="middle" fill="#93C5FD" font-size="8" font-family="monospace">Event Loop</text>
+          <!-- Indicador activo -->
+          <circle cx="85" cy="155" r="6" fill="#10B981" class="pulse-dot"/>
+          <text x="97" y="159" fill="#6EE7B7" font-size="8">activo</text>
+
+          <!-- Flechas de mensajes -->
+          <path d="M147 100 L173 100" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ww01-arrow)" class="msg-right"/>
+          <path d="M173 115 L147 115" stroke="#F472B6" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ww01-arrow-pink)" class="msg-left"/>
+          <text x="160" y="97" text-anchor="middle" fill="#38BDF8" font-size="7">postMessage</text>
+          <text x="160" y="128" text-anchor="middle" fill="#F472B6" font-size="7">message</text>
+
+          <!-- Worker Thread -->
+          <rect x="175" y="38" width="120" height="140" rx="7" fill="#3D0A24" stroke="#F472B6" stroke-width="2"/>
+          <text x="235" y="56" text-anchor="middle" fill="#F472B6" font-size="9" font-weight="700">WEB WORKER</text>
+          <rect x="185" y="64" width="100" height="18" rx="4" fill="#5a1035" stroke="#F472B6" stroke-width="1"/>
+          <text x="235" y="77" text-anchor="middle" fill="#FBCFE8" font-size="8" font-family="monospace">JS puro</text>
+          <rect x="185" y="88" width="100" height="18" rx="4" fill="#5a1035" stroke="#F472B6" stroke-width="1"/>
+          <text x="235" y="101" text-anchor="middle" fill="#FBCFE8" font-size="8" font-family="monospace">Sin DOM</text>
+          <rect x="185" y="112" width="100" height="18" rx="4" fill="#5a1035" stroke="#F472B6" stroke-width="1"/>
+          <text x="235" y="125" text-anchor="middle" fill="#FBCFE8" font-size="8" font-family="monospace">Hilo propio</text>
+          <!-- Indicador activo -->
+          <circle cx="235" cy="155" r="6" fill="#F472B6" class="pulse-dot-pink"/>
+          <text x="247" y="159" fill="#FBCFE8" font-size="8">activo</text>
+        </svg>
+      </div>
+
+      <div class="explanation">
+        <div class="definition-card">
+          <p>
+            Un <strong>Web Worker</strong> es un script JavaScript que el navegador ejecuta
+            en un <strong>hilo separado</strong>, en paralelo al hilo principal.
+          </p>
+        </div>
+
+        <div class="points">
+          <div class="point">
+            <span class="point-icon" style="background:#0C2A3F; color:#38BDF8;">🧵</span>
+            <div>
+              <strong>Hilo propio</strong>
+              <p>Corre en paralelo real, no intercalado. El navegador le asigna un hilo del sistema operativo.</p>
+            </div>
+          </div>
+          <div class="point">
+            <span class="point-icon" style="background:#3D0A24; color:#F472B6;">🚫</span>
+            <div>
+              <strong>Sin acceso al DOM</strong>
+              <p>No puede tocar la interfaz directamente. Se comunica con el hilo principal por mensajes.</p>
+            </div>
+          </div>
+          <div class="point">
+            <span class="point-icon" style="background:#064E3B; color:#10B981;">⚡</span>
+            <div>
+              <strong>UI siempre fluida</strong>
+              <p>Las tareas pesadas se delegan al worker, el hilo principal sigue respondiendo al usuario.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="types-note">
+          <span class="types-label">3 tipos de Workers</span>
+          <div class="types-list">
+            <div class="type-row active">
+              <span class="type-name">Dedicated <span class="type-sub">← este curso</span></span>
+              <span class="type-desc">Un worker exclusivo para un script. El más común.</span>
+            </div>
+            <div class="type-row">
+              <span class="type-name">Shared</span>
+              <span class="type-desc">Compartido entre múltiples scripts o pestañas.</span>
+            </div>
+            <div class="type-row">
+              <span class="type-name">Service</span>
+              <span class="type-desc">Intercepta red, habilita offline y PWAs.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="¡Un Web Worker es como contratar a un asistente! Tú sigues atendiendo clientes mientras él hace el trabajo pesado." mood="excited" position="top-left" />
+</section>
+
+<style>
+  .slide-ww01 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 70% 30%, #0C2A3F 0%, var(--color-bg) 65%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 880px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-main-thread, #38BDF8), var(--color-worker-thread, #F472B6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .svg-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .svg-box svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .explanation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .definition-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .definition-card strong {
+    color: var(--color-accent);
+  }
+
+  .points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .point {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .point-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+  }
+
+  .point strong {
+    display: block;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    margin-bottom: 2px;
+  }
+
+  .point p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .types-note {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .types-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .types-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+  }
+
+  .type-row.active {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  }
+
+  .type-name {
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 120px;
+  }
+
+  .type-row.active .type-name {
+    color: var(--color-accent);
+  }
+
+  .type-sub {
+    opacity: 0.7;
+    font-size: 0.85em;
+    font-weight: 400;
+  }
+
+  .type-desc {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+
+  /* Animaciones SVG */
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; r: 6; }
+    50%       { opacity: 0.5; r: 8; }
+  }
+  @keyframes pulse-pink {
+    0%, 100% { opacity: 1; r: 6; }
+    50%       { opacity: 0.5; r: 8; }
+  }
+  @keyframes msg-slide-right {
+    0%, 40%  { opacity: 0; transform: translateX(-8px); }
+    50%, 90% { opacity: 1; transform: translateX(0); }
+    100%     { opacity: 0; transform: translateX(8px); }
+  }
+  @keyframes msg-slide-left {
+    0%, 40%  { opacity: 0; transform: translateX(8px); }
+    50%, 90% { opacity: 1; transform: translateX(0); }
+    100%     { opacity: 0; transform: translateX(-8px); }
+  }
+
+  .pulse-dot      { animation: pulse-green 2s ease-in-out infinite; }
+  .pulse-dot-pink { animation: pulse-pink  2s ease-in-out infinite; animation-delay: 0.5s; }
+  .msg-right      { animation: msg-slide-right 3s ease-in-out infinite; }
+  .msg-left       { animation: msg-slide-left  3s ease-in-out infinite; animation-delay: 1.5s; }
+</style>

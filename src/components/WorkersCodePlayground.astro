@@ -1,0 +1,389 @@
+---
+// WorkersCodePlayground.astro — selector de ejemplos + pestañas main/worker + editor CodeMirror 6
+import { workerExamples } from '../data/workerExamples';
+---
+
+<div class="ww-playground">
+  <!-- Selector de ejemplos -->
+  <div class="example-selector">
+    <label for="ww-example-select" class="selector-label">Escenario:</label>
+    <select id="ww-example-select" class="example-select" aria-label="Seleccionar ejemplo de Web Workers">
+      {workerExamples.map((ex, i) => (
+        <option value={String(i)}>{ex.title}</option>
+      ))}
+    </select>
+  </div>
+
+  <!-- Descripción del ejemplo seleccionado -->
+  <p id="ww-example-description" class="example-description">
+    {workerExamples[0].description}
+  </p>
+
+  <!-- Pestañas -->
+  <div class="tabs" role="tablist" aria-label="Panel de código">
+    <button
+      id="ww-tab-main"
+      class="tab tab--active"
+      role="tab"
+      aria-selected="true"
+      aria-controls="ww-code-main"
+      aria-label="Ver código del Hilo Principal"
+    >
+      Hilo Principal
+    </button>
+    <button
+      id="ww-tab-worker"
+      class="tab"
+      role="tab"
+      aria-selected="false"
+      aria-controls="ww-code-worker"
+      aria-label="Ver código del Worker"
+    >
+      Worker
+    </button>
+  </div>
+
+  <!-- Panel: Hilo Principal -->
+  <div id="ww-code-main" class="code-panel" role="tabpanel" aria-labelledby="ww-tab-main">
+    <div id="ww-editor-main" class="code-editor" aria-label="Editor de código del hilo principal"></div>
+    <pre id="ww-fallback-main" class="code-fallback" hidden aria-label="Código del hilo principal">{workerExamples[0].mainCode}</pre>
+  </div>
+
+  <!-- Panel: Worker -->
+  <div id="ww-code-worker" class="code-panel" role="tabpanel" aria-labelledby="ww-tab-worker" hidden>
+    <div id="ww-editor-worker" class="code-editor" aria-label="Editor de código del worker"></div>
+    <pre id="ww-fallback-worker" class="code-fallback" hidden aria-label="Código del worker">{workerExamples[0].workerCode}</pre>
+  </div>
+
+  <!-- Botón Ejecutar -->
+  <div class="actions">
+    <button id="ww-btn-run" class="btn-run" aria-label="Ejecutar ejemplo">
+      ▶ Ejecutar
+    </button>
+  </div>
+</div>
+
+<script>
+  import { workerExamples } from '../data/workerExamples';
+
+  // ── Estado ───────────────────────────────────────────────────────────────────
+  let selectedIndex = 0;
+  let activeTab: 'main' | 'worker' = 'main';
+  let editorMain: import('@codemirror/view').EditorView | null = null;
+  let editorWorker: import('@codemirror/view').EditorView | null = null;
+  let highlightEffectMain: import('@codemirror/state').StateEffectType<number | null> | null = null;
+  let highlightEffectWorker: import('@codemirror/state').StateEffectType<number | null> | null = null;
+  let codeMirrorAvailable = false;
+
+  // ── Referencias DOM ──────────────────────────────────────────────────────────
+  const selectEl = document.getElementById('ww-example-select') as HTMLSelectElement;
+  const descEl = document.getElementById('ww-example-description') as HTMLParagraphElement;
+  const tabMain = document.getElementById('ww-tab-main') as HTMLButtonElement;
+  const tabWorker = document.getElementById('ww-tab-worker') as HTMLButtonElement;
+  const panelMain = document.getElementById('ww-code-main') as HTMLDivElement;
+  const panelWorker = document.getElementById('ww-code-worker') as HTMLDivElement;
+  const editorMainEl = document.getElementById('ww-editor-main') as HTMLDivElement;
+  const editorWorkerEl = document.getElementById('ww-editor-worker') as HTMLDivElement;
+  const fallbackMain = document.getElementById('ww-fallback-main') as HTMLPreElement;
+  const fallbackWorker = document.getElementById('ww-fallback-worker') as HTMLPreElement;
+  const btnRun = document.getElementById('ww-btn-run') as HTMLButtonElement;
+
+  // ── Pestañas ─────────────────────────────────────────────────────────────────
+  function switchTab(tab: 'main' | 'worker') {
+    activeTab = tab;
+
+    tabMain.classList.toggle('tab--active', tab === 'main');
+    tabMain.setAttribute('aria-selected', String(tab === 'main'));
+    tabWorker.classList.toggle('tab--active', tab === 'worker');
+    tabWorker.setAttribute('aria-selected', String(tab === 'worker'));
+
+    panelMain.hidden = tab !== 'main';
+    panelWorker.hidden = tab !== 'worker';
+  }
+
+  tabMain.addEventListener('click', () => switchTab('main'));
+  tabWorker.addEventListener('click', () => switchTab('worker'));
+
+  // ── Seleccionar ejemplo ──────────────────────────────────────────────────────
+  function selectExample(index: number) {
+    selectedIndex = index;
+    const example = workerExamples[index];
+
+    descEl.textContent = example.description;
+
+    if (codeMirrorAvailable && editorMain && editorWorker) {
+      editorMain.dispatch({
+        changes: { from: 0, to: editorMain.state.doc.length, insert: example.mainCode },
+      });
+      editorWorker.dispatch({
+        changes: { from: 0, to: editorWorker.state.doc.length, insert: example.workerCode },
+      });
+    } else {
+      fallbackMain.textContent = example.mainCode;
+      fallbackWorker.textContent = example.workerCode;
+    }
+
+    document.dispatchEvent(new CustomEvent('workers:load', { detail: { steps: example.steps } }));
+    document.dispatchEvent(new CustomEvent('workers:reset'));
+  }
+
+  selectEl.addEventListener('change', () => {
+    selectExample(parseInt(selectEl.value, 10));
+  });
+
+  // ── Botón Ejecutar ───────────────────────────────────────────────────────────
+  btnRun.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('workers:play'));
+  });
+
+  // ── Resaltado de línea activa ────────────────────────────────────────────────
+  function highlightLine(
+    editor: import('@codemirror/view').EditorView | null,
+    effect: import('@codemirror/state').StateEffectType<number | null> | null,
+    lineNumber: number | null
+  ) {
+    if (!editor || !effect) return;
+    editor.dispatch({ effects: effect.of(lineNumber) });
+  }
+
+  document.addEventListener('workers:step', (e: Event) => {
+    const detail = (e as CustomEvent).detail as { codeLine?: number; workerCodeLine?: number };
+    highlightLine(editorMain, highlightEffectMain, detail?.codeLine ?? null);
+    highlightLine(editorWorker, highlightEffectWorker, detail?.workerCodeLine ?? null);
+  });
+
+  // ── Inicializar CodeMirror ───────────────────────────────────────────────────
+  async function createEditor(
+    container: HTMLDivElement,
+    initialCode: string
+  ): Promise<{
+    view: import('@codemirror/view').EditorView;
+    effect: import('@codemirror/state').StateEffectType<number | null>;
+  }> {
+    const { EditorView, Decoration } = await import('@codemirror/view');
+    const { EditorState, StateEffect, StateField, RangeSet } = await import('@codemirror/state');
+    const { javascript } = await import('@codemirror/lang-javascript');
+    const { oneDark } = await import('@codemirror/theme-one-dark');
+
+    const effect = StateEffect.define<number | null>();
+
+    const highlightField = StateField.define<import('@codemirror/view').DecorationSet>({
+      create() { return Decoration.none; },
+      update(decorations, tr) {
+        decorations = decorations.map(tr.changes);
+        for (const eff of tr.effects) {
+          if (eff.is(effect)) {
+            const lineNum: number | null = eff.value;
+            if (lineNum === null || lineNum < 1) {
+              decorations = Decoration.none;
+            } else {
+              try {
+                const line = tr.state.doc.line(lineNum);
+                decorations = RangeSet.of([Decoration.line({ class: 'active-line' }).range(line.from)]);
+              } catch { decorations = Decoration.none; }
+            }
+          }
+        }
+        return decorations;
+      },
+      provide(field) { return EditorView.decorations.from(field); },
+    });
+
+    const view = new EditorView({
+      state: EditorState.create({
+        doc: initialCode,
+        extensions: [javascript(), oneDark, highlightField, EditorView.editable.of(false), EditorView.lineWrapping],
+      }),
+      parent: container,
+    });
+
+    return { view, effect };
+  }
+
+  async function initEditors() {
+    const first = workerExamples[0];
+    try {
+      const [mainResult, workerResult] = await Promise.all([
+        createEditor(editorMainEl, first.mainCode),
+        createEditor(editorWorkerEl, first.workerCode),
+      ]);
+      editorMain = mainResult.view;
+      highlightEffectMain = mainResult.effect;
+      editorWorker = workerResult.view;
+      highlightEffectWorker = workerResult.effect;
+      codeMirrorAvailable = true;
+    } catch (err) {
+      console.warn('[WorkersCodePlayground] CodeMirror no disponible, usando fallback:', err);
+      editorMainEl.hidden = true;
+      editorWorkerEl.hidden = true;
+      fallbackMain.hidden = false;
+      fallbackWorker.hidden = false;
+      fallbackMain.textContent = first.mainCode;
+      fallbackWorker.textContent = first.workerCode;
+    }
+  }
+
+  // ── Inicialización ───────────────────────────────────────────────────────────
+  const first = workerExamples[0];
+  descEl.textContent = first.description;
+  initEditors().then(() => {
+    document.dispatchEvent(new CustomEvent('workers:load', { detail: { steps: first.steps } }));
+  });
+</script>
+
+<style>
+  .ww-playground {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* ── Selector ── */
+  .example-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .selector-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .example-select {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 150ms ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-3) center;
+    padding-right: var(--space-8);
+  }
+
+  .example-select:hover,
+  .example-select:focus {
+    border-color: var(--color-accent);
+  }
+
+  /* ── Descripción ── */
+  .example-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    padding: var(--space-2) var(--space-3);
+    background-color: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    min-height: 2.5rem;
+  }
+
+  /* ── Pestañas ── */
+  .tabs {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tab {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+    margin-bottom: -1px;
+  }
+
+  .tab:hover {
+    color: var(--color-text);
+  }
+
+  .tab--active {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  /* ── Paneles de código ── */
+  .code-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Editor CodeMirror ── */
+  .code-editor {
+    height: 200px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  .code-editor :global(.cm-editor) {
+    height: 100%;
+    font-size: var(--text-sm);
+  }
+
+  .code-editor :global(.cm-scroller) {
+    overflow: auto;
+    font-family: var(--font-mono);
+  }
+
+  .code-editor :global(.active-line) {
+    background-color: color-mix(in srgb, var(--color-accent) 20%, transparent) !important;
+  }
+
+  /* ── Fallback ── */
+  .code-fallback {
+    height: 200px;
+    overflow: auto;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: #282c34;
+    color: #abb2bf;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    white-space: pre;
+  }
+
+  /* ── Botón Ejecutar ── */
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-run {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-text-inverse);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 150ms ease, transform 100ms ease;
+  }
+
+  .btn-run:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .btn-run:active {
+    transform: scale(0.97);
+  }
+</style>

@@ -1,0 +1,250 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-ww02">
+  <div class="content">
+    <h2 class="title">El problema del hilo bloqueado</h2>
+
+    <div class="main-grid">
+      <div class="analogy-box">
+        <!--
+          Analogía: caja registradora con un cliente lento que bloquea toda la cola.
+          El cliente "lento" (rojo) está en el cajero y no termina nunca.
+          Los demás clientes esperan sin moverse.
+        -->
+        <svg class="blocked-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg"
+             aria-label="Analogía de caja registradora bloqueada por un cliente lento">
+          <defs>
+            <marker id="ww02-arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#EF4444"/>
+            </marker>
+          </defs>
+
+          <!-- Mostrador -->
+          <rect x="10" y="80" width="90" height="60" rx="6" fill="#1D3461" stroke="#3B82F6" stroke-width="2"/>
+          <rect x="20" y="90" width="50" height="30" rx="3" fill="#0F172A"/>
+          <text x="45" y="110" text-anchor="middle" fill="#38BDF8" font-size="9" font-family="monospace">CAJA</text>
+          <rect x="30" y="125" width="30" height="8" rx="2" fill="#3B82F6" opacity="0.6"/>
+
+          <!-- Cajero -->
+          <circle cx="55" cy="60" r="14" fill="#38BDF8" opacity="0.9"/>
+          <text x="55" y="65" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="bold">👤</text>
+          <text x="55" y="78" text-anchor="middle" fill="#94A3B8" font-size="8">Cajero</text>
+
+          <!-- Línea de cola -->
+          <line x1="105" y1="110" x2="295" y2="110" stroke="#334155" stroke-width="2"/>
+
+          <!-- Cliente LENTO (bloqueando) — rojo, con reloj de arena animado -->
+          <g class="slow-client">
+            <circle cx="150" cy="95" r="14" fill="#7F1D1D" stroke="#EF4444" stroke-width="2"/>
+            <text x="150" y="100" text-anchor="middle" fill="#FCA5A5" font-size="11">⏳</text>
+          </g>
+          <!-- Burbuja "procesando..." -->
+          <rect x="115" y="60" width="72" height="20" rx="6" fill="#7F1D1D" stroke="#EF4444" stroke-width="1" class="bubble"/>
+          <text x="151" y="74" text-anchor="middle" fill="#FCA5A5" font-size="8" class="bubble">procesando...</text>
+          <line x1="151" y1="80" x2="151" y2="88" stroke="#EF4444" stroke-width="1" class="bubble"/>
+
+          <!-- Clientes esperando (grises, inmóviles) -->
+          <g class="waiting-client">
+            <circle cx="200" cy="95" r="12" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+            <text x="200" y="100" text-anchor="middle" fill="#94A3B8" font-size="10">😤</text>
+          </g>
+          <g class="waiting-client" style="animation-delay:0.3s">
+            <circle cx="240" cy="95" r="12" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+            <text x="240" y="100" text-anchor="middle" fill="#94A3B8" font-size="10">😤</text>
+          </g>
+          <g class="waiting-client" style="animation-delay:0.6s">
+            <circle cx="280" cy="95" r="12" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+            <text x="280" y="100" text-anchor="middle" fill="#94A3B8" font-size="10">😤</text>
+          </g>
+
+          <!-- Etiqueta "BLOQUEADO" -->
+          <rect x="10" y="155" width="300" height="22" rx="5" fill="#7F1D1D" opacity="0.7"/>
+          <text x="160" y="170" text-anchor="middle" fill="#FCA5A5" font-size="10" font-weight="700" letter-spacing="2">⛔ HILO BLOQUEADO — UI CONGELADA</text>
+        </svg>
+
+        <p class="analogy-caption">
+          Un cliente lento bloquea toda la cola. En JavaScript, una tarea pesada en el hilo principal
+          congela la UI: no hay clics, no hay animaciones, nada.
+        </p>
+      </div>
+
+      <div class="explanation">
+        <div class="problem-card">
+          <h3 class="problem-title">¿Qué ocurre en el navegador?</h3>
+          <div class="problem-steps">
+            <div class="problem-step bad">
+              <span class="step-icon">🔴</span>
+              <div>
+                <strong>Tarea pesada en el hilo principal</strong>
+                <p>Un cálculo largo, parsear un JSON enorme, procesar una imagen…</p>
+              </div>
+            </div>
+            <div class="problem-step bad">
+              <span class="step-icon">🔴</span>
+              <div>
+                <strong>El Event Loop se detiene</strong>
+                <p>Mientras esa tarea no termine, ningún otro código puede ejecutarse.</p>
+              </div>
+            </div>
+            <div class="problem-step bad">
+              <span class="step-icon">🔴</span>
+              <div>
+                <strong>La UI se congela</strong>
+                <p>Los clics, el scroll y las animaciones dejan de responder. El usuario ve la página "colgada".</p>
+              </div>
+            </div>
+            <div class="problem-step good">
+              <span class="step-icon">✅</span>
+              <div>
+                <strong>Solución: Web Workers</strong>
+                <p>Mover la tarea pesada a un hilo separado. El hilo principal queda libre.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="¿Ves al cliente lento? Eso es tu código bloqueando el hilo. ¡Los Web Workers son la segunda caja registradora!" mood="thinking" position="top-left" />
+</section>
+
+<style>
+  .slide-ww02 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 30% 60%, #2a0a0a 0%, var(--color-bg) 65%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 880px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: #EF4444;
+    text-align: center;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .analogy-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .blocked-svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .analogy-caption {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-style: italic;
+    line-height: 1.6;
+    border-left: 3px solid #EF4444;
+    padding-left: var(--space-3);
+  }
+
+  .explanation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .problem-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+
+  .problem-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+
+  .problem-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .problem-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .problem-step.bad {
+    background: #1a0a0a;
+    border: 1px solid #7F1D1D;
+  }
+
+  .problem-step.good {
+    background: #064E3B;
+    border: 1px solid #10B981;
+  }
+
+  .step-icon {
+    font-size: var(--text-base);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .problem-step strong {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    margin-bottom: 2px;
+  }
+
+  .problem-step p {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  /* Animaciones SVG */
+  @keyframes slow-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  @keyframes waiting-bob {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-3px); }
+  }
+
+  @keyframes bubble-fade {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
+  }
+
+  .slow-client { animation: slow-pulse 1.5s ease-in-out infinite; }
+  .waiting-client { animation: waiting-bob 2s ease-in-out infinite; }
+  .bubble { animation: bubble-fade 1.5s ease-in-out infinite; }
+</style>

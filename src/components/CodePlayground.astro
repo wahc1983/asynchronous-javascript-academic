@@ -1,0 +1,228 @@
+---
+// CodePlayground.astro — selector de ejemplos + editor CodeMirror 6
+---
+
+<div class="playground">
+  <!-- Selector de ejemplos -->
+  <div class="example-selector">
+    <label for="example-select" class="selector-label">Escenario:</label>
+    <select id="example-select" class="example-select" aria-label="Seleccionar ejemplo del Event Loop">
+      <!-- Opciones generadas por script -->
+    </select>
+  </div>
+
+  <!-- Descripción del ejemplo seleccionado -->
+  <p id="example-description" class="example-description"></p>
+
+  <!-- Editor CodeMirror -->
+  <div id="code-editor" class="code-editor" aria-label="Editor de código"></div>
+
+  <!-- Fallback si CodeMirror falla -->
+  <pre id="code-fallback" class="code-fallback" hidden aria-label="Código de ejemplo"></pre>
+</div>
+
+<script>
+  import { examples } from '../data/examples';
+
+  let selectedIndex = 0;
+  let editorView: import('@codemirror/view').EditorView | null = null;
+  let highlightEffect: import('@codemirror/state').StateEffectType<number | null> | null = null;
+
+  const selectEl = document.getElementById('example-select') as HTMLSelectElement;
+  const descEl = document.getElementById('example-description') as HTMLParagraphElement;
+  const editorContainer = document.getElementById('code-editor') as HTMLDivElement;
+  const fallbackPre = document.getElementById('code-fallback') as HTMLPreElement;
+
+  // ── Poblar el <select> ───────────────────────────────────────────────────────
+  examples.forEach((ex, i) => {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = ex.title;
+    selectEl.appendChild(opt);
+  });
+
+  // ── Seleccionar ejemplo ──────────────────────────────────────────────────────
+  function selectExample(index: number) {
+    selectedIndex = index;
+    const example = examples[index];
+
+    // Actualizar descripción
+    descEl.textContent = example.description;
+
+    // Actualizar editor
+    if (editorView) {
+      editorView.dispatch({
+        changes: { from: 0, to: editorView.state.doc.length, insert: example.code },
+      });
+    } else {
+      fallbackPre.textContent = example.code;
+    }
+
+    // Emitir eventos al visualizador
+    document.dispatchEvent(new CustomEvent('loop:load', { detail: { steps: example.steps } }));
+    document.dispatchEvent(new CustomEvent('loop:reset'));
+  }
+
+  selectEl.addEventListener('change', () => {
+    selectExample(parseInt(selectEl.value, 10));
+  });
+
+  // ── Resaltado de línea activa ────────────────────────────────────────────────
+  function highlightLine(lineNumber: number | null) {
+    if (!editorView || !highlightEffect) return;
+    editorView.dispatch({ effects: highlightEffect.of(lineNumber) });
+  }
+
+  // ── Inicializar CodeMirror ───────────────────────────────────────────────────
+  async function initCodeMirror(initialCode: string) {
+    try {
+      const { EditorView, Decoration } = await import('@codemirror/view');
+      const { EditorState, StateEffect, StateField, RangeSet } = await import('@codemirror/state');
+      const { javascript } = await import('@codemirror/lang-javascript');
+      const { oneDark } = await import('@codemirror/theme-one-dark');
+
+      highlightEffect = StateEffect.define<number | null>();
+
+      const highlightField = StateField.define<import('@codemirror/view').DecorationSet>({
+        create() { return Decoration.none; },
+        update(decorations, tr) {
+          decorations = decorations.map(tr.changes);
+          for (const effect of tr.effects) {
+            if (highlightEffect && effect.is(highlightEffect)) {
+              const lineNum: number | null = effect.value;
+              if (lineNum === null || lineNum < 1) {
+                decorations = Decoration.none;
+              } else {
+                try {
+                  const line = tr.state.doc.line(lineNum);
+                  decorations = RangeSet.of([Decoration.line({ class: 'active-line' }).range(line.from)]);
+                } catch { decorations = Decoration.none; }
+              }
+            }
+          }
+          return decorations;
+        },
+        provide(field) { return EditorView.decorations.from(field); },
+      });
+
+      editorView = new EditorView({
+        state: EditorState.create({
+          doc: initialCode,
+          extensions: [javascript(), oneDark, highlightField, EditorView.editable.of(false), EditorView.lineWrapping],
+        }),
+        parent: editorContainer,
+      });
+    } catch (err) {
+      console.warn('[CodePlayground] CodeMirror no disponible, usando fallback:', err);
+      editorContainer.hidden = true;
+      fallbackPre.hidden = false;
+      fallbackPre.textContent = initialCode;
+    }
+  }
+
+  document.addEventListener('loop:step', (e: Event) => {
+    const detail = (e as CustomEvent).detail as { codeLine?: number };
+    highlightLine(detail?.codeLine ?? null);
+  });
+
+  // ── Inicialización ───────────────────────────────────────────────────────────
+  const first = examples[0];
+  descEl.textContent = first.description;
+  await initCodeMirror(first.code);
+  document.dispatchEvent(new CustomEvent('loop:load', { detail: { steps: first.steps } }));
+</script>
+
+<style>
+  .playground {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* ── Selector ── */
+  .example-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .selector-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .example-select {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 150ms ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-3) center;
+    padding-right: var(--space-8);
+  }
+
+  .example-select:hover,
+  .example-select:focus {
+    border-color: var(--color-accent);
+  }
+
+  /* ── Descripción ── */
+  .example-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    padding: var(--space-2) var(--space-3);
+    background-color: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    min-height: 2.5rem;
+  }
+
+  /* ── Editor CodeMirror ── */
+  .code-editor {
+    height: 200px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  .code-editor :global(.cm-editor) {
+    height: 100%;
+    font-size: var(--text-sm);
+  }
+
+  .code-editor :global(.cm-scroller) {
+    overflow: auto;
+    font-family: var(--font-mono);
+  }
+
+  .code-editor :global(.active-line) {
+    background-color: color-mix(in srgb, var(--color-accent) 20%, transparent) !important;
+  }
+
+  /* ── Fallback ── */
+  .code-fallback {
+    height: 200px;
+    overflow: auto;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: #282c34;
+    color: #abb2bf;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    white-space: pre;
+  }
+</style>

@@ -1,0 +1,247 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-call-stack">
+  <div class="content">
+    <h2 class="title">El Call Stack <span class="subtitle-inline">(Pila de llamadas)</span></h2>
+
+    <div class="main-grid">
+      <div class="stack-visual" aria-label="Diagrama de pila de llamadas con funciones apiladas">
+        <div class="stack-label">Call Stack</div>
+        <div class="stack-container">
+          <div class="stack-frame frame-3">
+            <span class="frame-name">multiplicar()</span>
+            <span class="frame-tag">3°</span>
+          </div>
+          <div class="stack-frame frame-2">
+            <span class="frame-name">calcular()</span>
+            <span class="frame-tag">2°</span>
+          </div>
+          <div class="stack-frame frame-1">
+            <span class="frame-name">main()</span>
+            <span class="frame-tag">1°</span>
+          </div>
+        </div>
+        <div class="stack-base">
+          <span>← Base de la pila</span>
+        </div>
+
+        <svg class="lifo-arrow" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="30" y="14" text-anchor="middle" fill="#3B82F6" font-size="9" font-weight="bold">ENTRA</text>
+          <path d="M30 18 L30 50" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowDown)"/>
+          <text x="30" y="75" text-anchor="middle" fill="#8B5CF6" font-size="9" font-weight="bold">SALE</text>
+          <path d="M30 80 L30 112" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowUp)"/>
+          <defs>
+            <marker id="arrowDown" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+              <path d="M0,0 L3,6 L6,0 Z" fill="#3B82F6"/>
+            </marker>
+            <marker id="arrowUp" markerWidth="6" markerHeight="6" refX="3" refY="0" orient="auto">
+              <path d="M0,6 L3,0 L6,6 Z" fill="#8B5CF6"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="explanation">
+        <div class="description-card">
+          <p class="description">
+            Es como una pila de platos. El último que entra es el primero en salir
+            <strong>(LIFO — Last In, First Out)</strong>.
+          </p>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <span class="step-num">1</span>
+            <p>Cuando llamas a una función, se <strong>apila</strong> encima de la pila.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <p>Si esa función llama a otra, la nueva se apila <strong>encima</strong>.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <p>Cuando una función termina, se <strong>desapila</strong> y el control vuelve a la anterior.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">4</span>
+            <p>Si la pila se vacía, JavaScript está <strong>libre</strong> para procesar la siguiente tarea.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="Piensa en mí como la pila: el último en entrar es el primero en salir. ¡LIFO!" mood="thinking" />
+</section>
+
+<style>
+  .slide-call-stack {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 20% 50%, var(--color-call-stack-bg) 0%, var(--color-bg) 60%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 860px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--color-call-stack);
+    text-align: center;
+  }
+
+  .subtitle-inline {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  /* Stack visual */
+  .stack-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .stack-label {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-call-stack);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-1);
+  }
+
+  .stack-container {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .stack-frame {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-call-stack);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    animation: slideIn 0.4s ease both;
+  }
+
+  .frame-1 { background: #1D3461; color: #93C5FD; animation-delay: 0.1s; }
+  .frame-2 { background: #1e3a6e; color: #60A5FA; animation-delay: 0.25s; }
+  .frame-3 { background: #1e4080; color: #3B82F6; animation-delay: 0.4s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .frame-tag {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-weight: 400;
+  }
+
+  .stack-base {
+    width: 100%;
+    border-top: 3px solid var(--color-call-stack);
+    padding-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  .lifo-arrow {
+    width: 60px;
+    height: 120px;
+    margin-top: var(--space-2);
+  }
+
+  /* Explanation */
+  .explanation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .description-card {
+    background: var(--color-call-stack-bg);
+    border: 1px solid var(--color-call-stack);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .description {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .description strong {
+    color: var(--color-call-stack);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-call-stack);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+    padding-top: 4px;
+  }
+
+  .step strong {
+    color: var(--color-call-stack);
+  }
+</style>

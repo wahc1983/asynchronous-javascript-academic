@@ -1,0 +1,255 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-microtask">
+  <div class="content">
+    <h2 class="title">Microtareas vs. Macrotareas</h2>
+
+    <div class="analogy-banner">
+      <span class="analogy-icon">📝</span>
+      <p>
+        Las <strong class="micro">microtareas</strong> son como notas urgentes en tu escritorio que debes leer
+        <em>antes</em> de atender al siguiente cliente. Las <strong class="macro">macrotareas</strong>
+        son los clientes en la sala de espera.
+      </p>
+    </div>
+
+    <div class="main-grid">
+      <!-- Tabla comparativa -->
+      <div class="comparison-table">
+        <div class="table-header">
+          <div class="col-header micro-header">
+            <span class="col-dot micro-dot"></span>
+            Microtareas
+          </div>
+          <div class="col-header macro-header">
+            <span class="col-dot macro-dot"></span>
+            Macrotareas
+          </div>
+        </div>
+
+        <div class="table-row">
+          <div class="table-cell micro-cell"><code>Promise.then()</code></div>
+          <div class="table-cell macro-cell"><code>setTimeout()</code></div>
+        </div>
+        <div class="table-row">
+          <div class="table-cell micro-cell"><code>Promise.catch()</code></div>
+          <div class="table-cell macro-cell"><code>setInterval()</code></div>
+        </div>
+        <div class="table-row">
+          <div class="table-cell micro-cell"><code>queueMicrotask()</code></div>
+          <div class="table-cell macro-cell"><code>addEventListener</code></div>
+        </div>
+        <div class="table-row">
+          <div class="table-cell micro-cell"><code>async/await</code></div>
+          <div class="table-cell macro-cell"><code>MessageChannel</code></div>
+        </div>
+      </div>
+
+      <!-- Diagrama de prioridad -->
+      <div class="priority-diagram" aria-label="Diagrama de prioridad: microtareas antes que macrotareas">
+        <svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Call Stack vacío -->
+          <rect x="80" y="10" width="80" height="36" rx="6" fill="#1D3461" stroke="#3B82F6" stroke-width="1.5"/>
+          <text x="120" y="32" text-anchor="middle" fill="#93C5FD" font-size="9" font-weight="bold">Call Stack</text>
+          <text x="120" y="44" text-anchor="middle" fill="#64748B" font-size="7">(vacío)</text>
+
+          <!-- Flecha hacia microtask -->
+          <path d="M120 50 L120 70" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+          <text x="130" y="63" fill="#A78BFA" font-size="7">1° primero</text>
+
+          <!-- Microtask Queue -->
+          <rect x="40" y="74" width="160" height="36" rx="6" fill="#2E1065" stroke="#8B5CF6" stroke-width="2"/>
+          <text x="120" y="96" text-anchor="middle" fill="#C4B5FD" font-size="9" font-weight="bold">Microtask Queue</text>
+          <text x="120" y="108" text-anchor="middle" fill="#7C3AED" font-size="7">Promise.then, queueMicrotask…</text>
+
+          <!-- Flecha hacia callback -->
+          <path d="M120 114 L120 134" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowAmber)"/>
+          <text x="130" y="127" fill="#FCD34D" font-size="7">2° después</text>
+
+          <!-- Callback Queue -->
+          <rect x="40" y="138" width="160" height="36" rx="6" fill="#451A03" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="120" y="160" text-anchor="middle" fill="#FCD34D" font-size="9" font-weight="bold">Callback Queue</text>
+          <text x="120" y="172" text-anchor="middle" fill="#D97706" font-size="7">setTimeout, setInterval…</text>
+
+          <!-- Etiqueta "vaciar todo" -->
+          <text x="10" y="96" fill="#A78BFA" font-size="7" text-anchor="start">vaciar</text>
+          <text x="10" y="104" fill="#A78BFA" font-size="7" text-anchor="start">todo</text>
+          <path d="M30 96 L38 96" stroke="#8B5CF6" stroke-width="1" marker-end="url(#arrowPurpleSmall)"/>
+
+          <defs>
+            <marker id="arrowPurple" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+              <path d="M0,0 L3,6 L6,0 Z" fill="#8B5CF6"/>
+            </marker>
+            <marker id="arrowAmber" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+              <path d="M0,0 L3,6 L6,0 Z" fill="#F59E0B"/>
+            </marker>
+            <marker id="arrowPurpleSmall" markerWidth="5" markerHeight="5" refX="5" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="#8B5CF6"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+    <div class="key-rule">
+      <span class="rule-badge">Regla clave</span>
+      <p>
+        Las microtareas <strong>SIEMPRE</strong> se procesan antes que las macrotareas.
+        El Event Loop vacía <em>toda</em> la Microtask Queue antes de tomar una sola macrotarea.
+      </p>
+    </div>
+  </div>
+  <Mascot message="¡Las microtareas son VIP! Siempre van primero que los setTimeout." mood="cool" position="top-left" />
+</section>
+
+<style>
+  .slide-microtask {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 40% 30%, var(--color-microtask-queue-bg) 0%, var(--color-bg) 60%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 860px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--color-microtask-queue);
+    text-align: center;
+  }
+
+  .analogy-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    background: var(--color-microtask-queue-bg);
+    border: 1px solid var(--color-microtask-queue);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .analogy-icon {
+    font-size: var(--text-2xl);
+    flex-shrink: 0;
+  }
+
+  .analogy-banner p {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .micro { color: var(--color-microtask-queue); }
+  .macro { color: var(--color-callback-queue); }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  /* Tabla comparativa */
+  .comparison-table {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .col-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .micro-header { background: var(--color-microtask-queue-bg); color: var(--color-microtask-queue); }
+  .macro-header { background: var(--color-callback-queue-bg); color: var(--color-callback-queue); }
+
+  .col-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .micro-dot { background: var(--color-microtask-queue); }
+  .macro-dot { background: var(--color-callback-queue); }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .table-cell {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .micro-cell { border-right: 1px solid var(--color-border); }
+
+  .micro-cell code { color: var(--color-microtask-queue); }
+  .macro-cell code { color: var(--color-callback-queue); }
+
+  /* Priority diagram */
+  .priority-diagram svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 12px #8B5CF622);
+  }
+
+  /* Key rule */
+  .key-rule {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: linear-gradient(135deg, var(--color-microtask-queue-bg), #1a0a30);
+    border: 2px solid var(--color-microtask-queue);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .rule-badge {
+    background: var(--color-microtask-queue);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .key-rule p {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .key-rule strong {
+    color: var(--color-microtask-queue);
+  }
+</style>

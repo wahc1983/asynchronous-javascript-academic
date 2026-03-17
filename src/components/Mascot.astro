@@ -1,0 +1,223 @@
+---
+interface Props {
+  message: string;
+  mood?: 'happy' | 'thinking' | 'excited' | 'explaining' | 'cool';
+  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+}
+
+const {
+  message,
+  mood = 'happy',
+  position = 'top-right',
+} = Astro.props;
+
+const isBottom = position.startsWith('bottom');
+const isRight  = position.endsWith('right');
+
+// Ojos según mood
+const eyeMap = {
+  happy:      { left: '◕', right: '◕' },
+  thinking:   { left: '◔', right: '◕' },
+  excited:    { left: '★', right: '★' },
+  explaining: { left: '◉', right: '◉' },
+  cool:       { left: '▰', right: '▰' },
+};
+
+const eyes = eyeMap[mood];
+---
+
+<div class={`mascot mascot--${position} mascot--${mood}`} aria-label={`Loopy dice: ${message}`}>
+  <!-- Bocadillo -->
+  <div class="mascot-bubble">
+    <p class="mascot-text">{message}</p>
+    <div class={`bubble-tail bubble-tail--${isBottom ? 'top' : 'bottom'} bubble-tail--${isRight ? 'right' : 'left'}`}></div>
+  </div>
+
+  <!-- Robot SVG -->
+  <div class="mascot-robot">
+    <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg" class="robot-svg">
+      <!-- Antena -->
+      <line x1="32" y1="4" x2="32" y2="12" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" class="antenna-line"/>
+      <circle cx="32" cy="3" r="3.5" fill="#38BDF8" class="antenna-dot"/>
+
+      <!-- Cabeza -->
+      <rect x="10" y="12" width="44" height="32" rx="10" fill="#1E293B" stroke="#38BDF8" stroke-width="2" class="head"/>
+
+      <!-- Ojos -->
+      <circle cx="23" cy="26" r="7" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" class="eye-socket"/>
+      <circle cx="41" cy="26" r="7" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" class="eye-socket"/>
+      <text x="23" y="30" text-anchor="middle" font-size="9" fill="#38BDF8" class="eye-glyph">{eyes.left}</text>
+      <text x="41" y="30" text-anchor="middle" font-size="9" fill="#38BDF8" class="eye-glyph">{eyes.right}</text>
+
+      <!-- Boca -->
+      <rect x="20" y="36" width="24" height="5" rx="2.5" fill="#334155" class="mouth"/>
+      <rect x="22" y="37" width="6" height="3" rx="1.5" fill="#38BDF8" class="mouth-led mouth-led-1"/>
+      <rect x="29" y="37" width="6" height="3" rx="1.5" fill="#8B5CF6" class="mouth-led mouth-led-2"/>
+      <rect x="36" y="37" width="6" height="3" rx="1.5" fill="#10B981" class="mouth-led mouth-led-3"/>
+
+      <!-- Cuerpo -->
+      <rect x="14" y="46" width="36" height="26" rx="8" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" class="body"/>
+
+      <!-- Pecho: ícono loop -->
+      <circle cx="32" cy="59" r="8" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" class="chest-circle"/>
+      <text x="32" y="63" text-anchor="middle" font-size="10" fill="#38BDF8" class="chest-icon">↻</text>
+
+      <!-- Brazos -->
+      <rect x="2" y="48" width="10" height="18" rx="5" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" class="arm arm-left"/>
+      <rect x="52" y="48" width="10" height="18" rx="5" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" class="arm arm-right"/>
+
+      <!-- Piernas -->
+      <rect x="17" y="72" width="10" height="8" rx="4" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" class="leg"/>
+      <rect x="37" y="72" width="10" height="8" rx="4" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" class="leg"/>
+    </svg>
+  </div>
+</div>
+
+<style>
+  .mascot {
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* Posiciones */
+  .mascot--top-right    { top: var(--space-4); right: var(--space-6); flex-direction: row-reverse; }
+  .mascot--top-left     { top: var(--space-4); left:  var(--space-6); flex-direction: row; }
+  .mascot--bottom-right { bottom: var(--space-8); right: var(--space-6); flex-direction: row-reverse; align-items: flex-end; }
+  .mascot--bottom-left  { bottom: var(--space-8); left:  var(--space-6); flex-direction: row;         align-items: flex-end; }
+
+  /* Robot */
+  .mascot-robot {
+    flex-shrink: 0;
+    animation: mascot-float 3s ease-in-out infinite;
+  }
+
+  .robot-svg {
+    width: 72px;
+    height: auto;
+    filter: drop-shadow(0 4px 12px #38BDF840);
+  }
+
+  @keyframes mascot-float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  /* Antena */
+  .antenna-dot {
+    animation: antenna-blink 2s ease-in-out infinite;
+  }
+
+  @keyframes antenna-blink {
+    0%, 80%, 100% { fill: #38BDF8; opacity: 1; }
+    90%           { fill: #F59E0B; opacity: 0.6; }
+  }
+
+  /* Ojos */
+  .eye-glyph {
+    animation: eye-blink 4s ease-in-out infinite;
+  }
+
+  @keyframes eye-blink {
+    0%, 90%, 100% { opacity: 1; transform: scaleY(1); }
+    95%           { opacity: 0.1; transform: scaleY(0.1); }
+  }
+
+  /* LEDs de la boca */
+  .mouth-led-1 { animation: led-pulse 1.2s ease-in-out infinite; }
+  .mouth-led-2 { animation: led-pulse 1.2s ease-in-out infinite 0.4s; }
+  .mouth-led-3 { animation: led-pulse 1.2s ease-in-out infinite 0.8s; }
+
+  @keyframes led-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+  }
+
+  /* Ícono loop en el pecho */
+  .chest-icon {
+    animation: chest-spin 4s linear infinite;
+    transform-origin: 32px 59px;
+  }
+
+  @keyframes chest-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Brazos según mood */
+  .mascot--excited .arm-left  { animation: wave-left  0.6s ease-in-out infinite alternate; }
+  .mascot--excited .arm-right { animation: wave-right 0.6s ease-in-out infinite alternate; }
+
+  @keyframes wave-left {
+    from { transform: rotate(-15deg); transform-origin: 7px 48px; }
+    to   { transform: rotate(15deg);  transform-origin: 7px 48px; }
+  }
+  @keyframes wave-right {
+    from { transform: rotate(15deg);  transform-origin: 57px 48px; }
+    to   { transform: rotate(-15deg); transform-origin: 57px 48px; }
+  }
+
+  .mascot--thinking .arm-right {
+    animation: scratch 1.5s ease-in-out infinite;
+    transform-origin: 57px 48px;
+  }
+
+  @keyframes scratch {
+    0%, 100% { transform: rotate(-10deg); }
+    50%       { transform: rotate(20deg); }
+  }
+
+  /* Bocadillo */
+  .mascot-bubble {
+    position: relative;
+    background: var(--color-surface);
+    border: 1.5px solid #38BDF8;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    max-width: 200px;
+    animation: bubble-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    box-shadow: 0 4px 20px #38BDF820;
+  }
+
+  @keyframes bubble-appear {
+    from { opacity: 0; transform: scale(0.8) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .mascot-text {
+    font-size: 0.72rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Cola del bocadillo */
+  .bubble-tail {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  /* Cola apunta hacia arriba (robot está arriba → posiciones top-*) */
+  .bubble-tail--top {
+    top: -9px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 9px solid #38BDF8;
+  }
+  .bubble-tail--top.bubble-tail--right { right: 16px; }
+  .bubble-tail--top.bubble-tail--left  { left:  16px; }
+
+  /* Cola apunta hacia abajo (robot está abajo → posiciones bottom-*) */
+  .bubble-tail--bottom {
+    bottom: -9px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 9px solid #38BDF8;
+  }
+  .bubble-tail--bottom.bubble-tail--right { right: 16px; }
+  .bubble-tail--bottom.bubble-tail--left  { left:  16px; }
+</style>

@@ -1,0 +1,286 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-single-thread">
+  <div class="content">
+    <h2 class="title">JavaScript es de un solo hilo</h2>
+
+    <div class="main-grid">
+      <div class="analogy-box">
+        <!--
+          Cada persona tiene el MISMO keyframe "person-cycle" pero con
+          animation-delay negativo distinto, de modo que siempre están
+          en fases distintas del ciclo. Nunca hay reset global visible.
+
+          Ciclo de 8 s por persona:
+            0   – 12.5% (0–1s)   : espera en slot 4 (x=270)
+            12.5– 25%  (1–2s)   : avanza slot 4→3 (270→230)
+            25  – 37.5% (2–3s)   : avanza slot 3→2 (230→190)
+            37.5– 50%  (3–4s)   : avanza slot 2→1 (190→150)
+            50  – 62.5% (4–5s)   : avanza slot 1→cajero (150→55)
+            62.5– 75%  (5–6s)   : siendo atendida (en x=55)
+            75  – 81%  (6–6.5s) : desaparece (opacity 0)
+            81  – 99%  (6.5–7.9s): invisible, vuelve a x=270
+            99  – 100% (7.9–8s) : reaparece en x=270
+
+          Delays: p1=0s, p2=-2s, p3=-4s, p4=-6s
+          → siempre hay una persona en cada cuadrante del ciclo
+        -->
+        <svg class="cashier-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg"
+             aria-label="Animación de caja registradora con cola infinita">
+
+          <defs>
+            <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#38BDF8"/>
+            </marker>
+            <!-- Clip para ocultar personas fuera del área de cola -->
+            <clipPath id="queue-clip">
+              <rect x="40" y="70" width="270" height="60"/>
+            </clipPath>
+          </defs>
+
+          <!-- ── Mostrador / caja registradora ── -->
+          <rect x="10" y="80" width="90" height="60" rx="6" fill="#1D3461" stroke="#3B82F6" stroke-width="2"/>
+          <rect x="20" y="90" width="50" height="30" rx="3" fill="#0F172A"/>
+          <text x="45" y="110" text-anchor="middle" fill="#38BDF8" font-size="9" font-family="monospace">CAJA</text>
+          <rect x="30" y="125" width="30" height="8" rx="2" fill="#3B82F6" opacity="0.6"/>
+
+          <!-- ── Cajero ── -->
+          <circle cx="55" cy="60" r="14" fill="#38BDF8" opacity="0.9" class="cashier-circle"/>
+          <text x="55" y="65" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="bold">👤</text>
+          <text x="55" y="78" text-anchor="middle" fill="#94A3B8" font-size="8">Cajero</text>
+
+          <!-- ── Línea de cola ── -->
+          <line x1="105" y1="110" x2="290" y2="110" stroke="#334155" stroke-width="2"/>
+          <line x1="105" y1="110" x2="130" y2="110" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="210" y="130" text-anchor="middle" fill="#64748B" font-size="9">← Cola de tareas →</text>
+
+          <!-- ── Flecha de atención ── -->
+          <path class="attention-arrow" d="M 100 100 Q 120 85 135 95"
+                stroke="#38BDF8" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+          <!-- ── Personas (mismo keyframe, delays distintos) ── -->
+          <!-- p1: delay 0s   → empieza en slot 4, fase 0 -->
+          <g class="person p1">
+            <circle r="12" fill="#10B981"/>
+            <text text-anchor="middle" dy="4" fill="#fff" font-size="10">👤</text>
+          </g>
+
+          <!-- p2: delay -2s  → empieza en mitad del ciclo -->
+          <g class="person p2">
+            <circle r="12" fill="#F59E0B"/>
+            <text text-anchor="middle" dy="4" fill="#fff" font-size="10">👤</text>
+          </g>
+
+          <!-- p3: delay -4s -->
+          <g class="person p3">
+            <circle r="12" fill="#8B5CF6"/>
+            <text text-anchor="middle" dy="4" fill="#fff" font-size="10">👤</text>
+          </g>
+
+          <!-- p4: delay -6s -->
+          <g class="person p4">
+            <circle r="12" fill="#EC4899"/>
+            <text text-anchor="middle" dy="4" fill="#fff" font-size="10">👤</text>
+          </g>
+        </svg>
+
+        <p class="analogy-caption">
+          "Imagina una caja registradora con un solo cajero. Solo puede atender a una persona a la vez,
+          pero la cola sigue avanzando."
+        </p>
+      </div>
+
+      <div class="comparison">
+        <div class="comparison-item">
+          <span class="comparison-icon" style="background: var(--color-call-stack-bg); color: var(--color-call-stack);">⚙️</span>
+          <div>
+            <strong>El cajero</strong>
+            <p>= El motor de JavaScript (V8, SpiderMonkey…)</p>
+          </div>
+        </div>
+        <div class="comparison-item">
+          <span class="comparison-icon" style="background: #1a2a1a; color: #10B981;">🧑‍💼</span>
+          <div>
+            <strong>Las personas en la cola</strong>
+            <p>= El código síncrono esperando ejecutarse</p>
+          </div>
+        </div>
+        <div class="comparison-item">
+          <span class="comparison-icon" style="background: #2a1a0a; color: var(--color-callback-queue);">📋</span>
+          <div>
+            <strong>Un solo hilo</strong>
+            <p>= Solo una tarea a la vez, sin interrupciones</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="Un solo cajero = un solo hilo. ¡Solo puede atender de uno en uno!" mood="explaining" position="top-left" />
+</section>
+
+<style>
+  .slide-single-thread {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 30% 60%, #1a1a2e 0%, var(--color-bg) 65%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 860px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--color-text);
+    text-align: center;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .analogy-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .cashier-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .analogy-caption {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-style: italic;
+    line-height: 1.6;
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-3);
+  }
+
+  .comparison {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .comparison-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .comparison-icon {
+    font-size: var(--text-xl);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .comparison-item strong {
+    display: block;
+    color: var(--color-text);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-1);
+  }
+
+  .comparison-item p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  /* ════════════════════════════════════════
+     ANIMACIONES SVG
+     Ciclo: 8s por persona
+     Slots X: cajero=55, s1=150, s2=190, s3=230, s4=270
+     Y base: 95
+
+     Cada persona recorre: s4 → s3 → s2 → s1 → cajero → atiende → fade → reset invisible → reaparece
+     Los delays negativos hacen que arranquen en distintas fases:
+       p1: delay  0s  (arranca en s4, fase inicial)
+       p2: delay -2s  (arranca como si llevara 2s, en s3)
+       p3: delay -4s  (arranca como si llevara 4s, en s1)
+       p4: delay -6s  (arranca como si llevara 6s, siendo atendida)
+  ════════════════════════════════════════ */
+
+  .person { transform-origin: 0 0; }
+
+  @keyframes person-cycle {
+    /* Slot 4 — espera */
+    0%     { transform: translate(270px, 95px); opacity: 1; }
+    6.25%  { transform: translate(270px, 95px); opacity: 1; }
+    /* Slot 4 → 3 */
+    18.75% { transform: translate(230px, 95px); opacity: 1; }
+    /* Slot 3 → 2 */
+    31.25% { transform: translate(190px, 95px); opacity: 1; }
+    /* Slot 2 → 1 */
+    43.75% { transform: translate(150px, 95px); opacity: 1; }
+    /* Slot 1 → cajero */
+    56.25% { transform: translate(55px,  95px); opacity: 1; }
+    /* Siendo atendida */
+    68.75% { transform: translate(55px,  95px); opacity: 1; }
+    /* Fade out */
+    75%    { transform: translate(55px,  95px); opacity: 0; }
+    /* Reset invisible a slot 4 */
+    75.01% { transform: translate(270px, 95px); opacity: 0; }
+    /* Reaparece en slot 4 */
+    93.75% { transform: translate(270px, 95px); opacity: 0; }
+    100%   { transform: translate(270px, 95px); opacity: 1; }
+  }
+
+  /* Cajero pulsa verde mientras atiende (62.5%–75% del ciclo de 8s) */
+  @keyframes cashier-pulse {
+    0%     { fill: #38BDF8; }
+    56%    { fill: #38BDF8; }
+    62%    { fill: #10B981; }
+    68%    { fill: #38BDF8; }
+    72%    { fill: #10B981; }
+    78%    { fill: #38BDF8; }
+    100%   { fill: #38BDF8; }
+  }
+
+  /* Flecha visible mientras la persona 1 (delay 0) está en el cajero */
+  @keyframes arrow-blink {
+    0%     { opacity: 0; }
+    50%    { opacity: 0; }
+    56.25% { opacity: 1; }
+    75%    { opacity: 1; }
+    81%    { opacity: 0; }
+    100%   { opacity: 0; }
+  }
+
+  .p1 { animation: person-cycle 8s cubic-bezier(0.4, 0, 0.2, 1) infinite; animation-delay:  0s; }
+  .p2 { animation: person-cycle 8s cubic-bezier(0.4, 0, 0.2, 1) infinite; animation-delay: -2s; }
+  .p3 { animation: person-cycle 8s cubic-bezier(0.4, 0, 0.2, 1) infinite; animation-delay: -4s; }
+  .p4 { animation: person-cycle 8s cubic-bezier(0.4, 0, 0.2, 1) infinite; animation-delay: -6s; }
+
+  .cashier-circle { animation: cashier-pulse 8s ease-in-out infinite; }
+  .attention-arrow { animation: arrow-blink 8s ease-in-out infinite; }
+</style>

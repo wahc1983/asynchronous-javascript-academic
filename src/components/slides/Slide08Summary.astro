@@ -1,0 +1,236 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-summary">
+  <div class="content">
+    <h2 class="title">Resumen: El Event Loop completo</h2>
+
+    <div class="diagram-wrapper" aria-label="Diagrama completo del Event Loop con todos sus componentes">
+      <svg class="full-diagram" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- Call Stack -->
+        <rect x="10" y="60" width="120" height="100" rx="8" fill="#1D3461" stroke="#3B82F6" stroke-width="2"/>
+        <text x="70" y="82" text-anchor="middle" fill="#3B82F6" font-size="10" font-weight="bold">CALL STACK</text>
+        <rect x="22" y="90" width="96" height="22" rx="4" fill="#1e3a6e" stroke="#3B82F6" stroke-width="1"/>
+        <text x="70" y="105" text-anchor="middle" fill="#93C5FD" font-size="8" font-family="monospace">fn()</text>
+        <rect x="22" y="116" width="96" height="22" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1" opacity="0.6"/>
+        <text x="70" y="131" text-anchor="middle" fill="#60A5FA" font-size="8" font-family="monospace">main()</text>
+        <line x1="10" y1="148" x2="130" y2="148" stroke="#3B82F6" stroke-width="2"/>
+
+        <!-- Flecha CS → Web APIs -->
+        <path d="M132 110 L178 110" stroke="#64748B" stroke-width="2" marker-end="url(#arrowGray)"/>
+        <text x="155" y="105" text-anchor="middle" fill="#64748B" font-size="7">async</text>
+
+        <!-- Web APIs -->
+        <rect x="180" y="60" width="120" height="100" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="2"/>
+        <text x="240" y="82" text-anchor="middle" fill="#10B981" font-size="10" font-weight="bold">WEB APIs</text>
+        <text x="240" y="100" text-anchor="middle" fill="#6EE7B7" font-size="8">⏱ setTimeout</text>
+        <text x="240" y="116" text-anchor="middle" fill="#6EE7B7" font-size="8">🌐 fetch</text>
+        <text x="240" y="132" text-anchor="middle" fill="#6EE7B7" font-size="8">🖱 DOM Events</text>
+
+        <!-- Flecha Web APIs → Callback Queue -->
+        <path d="M302 130 L348 150" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowAmber)"/>
+        <text x="330" y="135" fill="#F59E0B" font-size="7">macro</text>
+
+        <!-- Flecha Web APIs → Microtask Queue -->
+        <path d="M302 90 L348 70" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+        <text x="330" y="75" fill="#8B5CF6" font-size="7">micro</text>
+
+        <!-- Microtask Queue -->
+        <rect x="350" y="40" width="150" height="60" rx="8" fill="#2E1065" stroke="#8B5CF6" stroke-width="2"/>
+        <text x="425" y="62" text-anchor="middle" fill="#8B5CF6" font-size="9" font-weight="bold">MICROTASK QUEUE</text>
+        <text x="425" y="78" text-anchor="middle" fill="#C4B5FD" font-size="7">Promise.then · queueMicrotask</text>
+        <text x="425" y="90" text-anchor="middle" fill="#7C3AED" font-size="7">⬆ Prioridad alta</text>
+
+        <!-- Callback Queue -->
+        <rect x="350" y="130" width="150" height="60" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="2"/>
+        <text x="425" y="152" text-anchor="middle" fill="#F59E0B" font-size="9" font-weight="bold">CALLBACK QUEUE</text>
+        <text x="425" y="168" text-anchor="middle" fill="#FCD34D" font-size="7">setTimeout · setInterval</text>
+        <text x="425" y="180" text-anchor="middle" fill="#D97706" font-size="7">⬇ Prioridad normal</text>
+
+        <!-- Event Loop (círculo central) -->
+        <circle cx="580" cy="110" r="42" fill="#0F172A" stroke="url(#loopGrad)" stroke-width="3"/>
+        <text x="580" y="105" text-anchor="middle" fill="#F1F5F9" font-size="9" font-weight="bold">EVENT</text>
+        <text x="580" y="118" text-anchor="middle" fill="#F1F5F9" font-size="9" font-weight="bold">LOOP</text>
+        <text x="580" y="131" text-anchor="middle" fill="#38BDF8" font-size="16">↻</text>
+
+        <!-- Flechas Queue → Event Loop -->
+        <path d="M502 70 L538 95" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+        <path d="M502 155 L538 125" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowAmber)"/>
+
+        <!-- Flecha Event Loop → Call Stack (retorno) -->
+        <path d="M540 110 Q400 210 70 165" stroke="#38BDF8" stroke-width="2" fill="none"
+          stroke-dasharray="6,3" marker-end="url(#arrowBlue)"/>
+        <text x="300" y="205" text-anchor="middle" fill="#38BDF8" font-size="8">→ ejecuta callback</text>
+
+        <!-- Etiqueta prioridad -->
+        <text x="510" y="110" text-anchor="middle" fill="#A78BFA" font-size="7">1°</text>
+        <text x="510" y="140" text-anchor="middle" fill="#FCD34D" font-size="7">2°</text>
+
+        <defs>
+          <linearGradient id="loopGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#38BDF8"/>
+            <stop offset="50%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#10B981"/>
+          </linearGradient>
+          <marker id="arrowGray" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#64748B"/>
+          </marker>
+          <marker id="arrowAmber" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#F59E0B"/>
+          </marker>
+          <marker id="arrowPurple" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#8B5CF6"/>
+          </marker>
+          <marker id="arrowBlue" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#38BDF8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="bottom-grid">
+      <div class="resources">
+        <h3 class="resources-title">📚 Para profundizar</h3>
+        <ul class="resources-list">
+          <li>
+            <span class="resource-tag">Video</span>
+            <span>"What the heck is the event loop anyway?" — Philip Roberts (JSConf EU)</span>
+          </li>
+          <li>
+            <span class="resource-tag">Docs</span>
+            <span>MDN Web Docs: Event Loop</span>
+          </li>
+          <li>
+            <span class="resource-tag">Video</span>
+            <span>Jake Archibald: In The Loop (JSConf Asia)</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="closing-message">
+        <p class="closing-emoji">🚀</p>
+        <p class="closing-text">
+          Ahora que entiendes el Event Loop, puedes escribir código asíncrono con confianza.
+          ¡El comportamiento de JavaScript ya no es magia, es mecánica!
+        </p>
+      </div>
+    </div>
+  </div>
+  <Mascot message="¡Lo lograste! Ya conoces todos mis secretos. ¡Ahora a escribir código asíncrono sin miedo! 🎉" mood="excited" position="bottom-left" />
+</section>
+
+<style>
+  .slide-summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at 50% 50%, #1a1a2e 0%, var(--color-bg) 65%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 900px;
+    padding: var(--space-6) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, #38BDF8, #8B5CF6, #10B981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  .diagram-wrapper {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .full-diagram {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 20px #38BDF822);
+  }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  /* Resources */
+  .resources {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+
+  .resources-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+
+  .resources-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .resources-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .resource-tag {
+    background: var(--color-surface-2);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Closing message */
+  .closing-message {
+    background: linear-gradient(135deg, #1a2a4a, #1a1a2e);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .closing-emoji {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .closing-text {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+</style>

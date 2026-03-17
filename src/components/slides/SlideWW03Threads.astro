@@ -1,0 +1,256 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-ww03">
+  <div class="content">
+    <h2 class="title">Main Thread vs Worker Thread</h2>
+
+    <div class="main-grid">
+      <div class="svg-box">
+        <svg viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg"
+             aria-label="Diagrama de Main Thread y Worker Thread corriendo en paralelo">
+          <defs>
+            <marker id="ww03-arrow-blue" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#38BDF8"/>
+            </marker>
+            <marker id="ww03-arrow-pink" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#F472B6"/>
+            </marker>
+          </defs>
+
+          <!-- Título tiempo -->
+          <text x="160" y="16" text-anchor="middle" fill="#64748B" font-size="8" font-weight="600">TIEMPO →</text>
+          <line x1="20" y1="20" x2="300" y2="20" stroke="#334155" stroke-width="1" stroke-dasharray="4,3"/>
+
+          <!-- ── MAIN THREAD ── -->
+          <rect x="10" y="28" width="300" height="80" rx="8" fill="#0C2A3F" stroke="#38BDF8" stroke-width="2"/>
+          <text x="20" y="44" fill="#38BDF8" font-size="9" font-weight="700">MAIN THREAD</text>
+          <text x="20" y="56" fill="#64748B" font-size="7">(gestiona DOM, UI, Event Loop)</text>
+
+          <!-- Bloques de tareas del Main Thread -->
+          <rect x="20" y="62" width="40" height="34" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1.5" class="mt-block"/>
+          <text x="40" y="83" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">click</text>
+
+          <rect x="68" y="62" width="50" height="34" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1.5" class="mt-block" style="animation-delay:0.3s"/>
+          <text x="93" y="83" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">render</text>
+
+          <rect x="126" y="62" width="35" height="34" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1.5" class="mt-block" style="animation-delay:0.6s"/>
+          <text x="143" y="83" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">fetch</text>
+
+          <rect x="169" y="62" width="45" height="34" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1.5" class="mt-block" style="animation-delay:0.9s"/>
+          <text x="191" y="83" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">scroll</text>
+
+          <rect x="222" y="62" width="40" height="34" rx="4" fill="#1D3461" stroke="#3B82F6" stroke-width="1.5" class="mt-block" style="animation-delay:1.2s"/>
+          <text x="242" y="83" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">paint</text>
+
+          <!-- Etiqueta "libre" -->
+          <text x="275" y="83" fill="#10B981" font-size="8" font-weight="600">✓ libre</text>
+
+          <!-- Separador "PARALELO" -->
+          <text x="160" y="122" text-anchor="middle" fill="#FCD34D" font-size="9" font-weight="700">⚡ PARALELO</text>
+          <line x1="20" y1="126" x2="140" y2="126" stroke="#FCD34D" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+          <line x1="180" y1="126" x2="300" y2="126" stroke="#FCD34D" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+
+          <!-- ── WORKER THREAD ── -->
+          <rect x="10" y="130" width="300" height="70" rx="8" fill="#3D0A24" stroke="#F472B6" stroke-width="2"/>
+          <text x="20" y="146" fill="#F472B6" font-size="9" font-weight="700">WORKER THREAD</text>
+          <text x="20" y="158" fill="#64748B" font-size="7">(cálculo intensivo, sin DOM)</text>
+
+          <!-- Bloque largo del Worker (tarea pesada) -->
+          <rect x="20" y="162" width="240" height="28" rx="4" fill="#5a1035" stroke="#F472B6" stroke-width="1.5" class="wt-block"/>
+          <text x="140" y="180" text-anchor="middle" fill="#FBCFE8" font-size="8" font-family="monospace">calcular primos(1_000_000) ...</text>
+
+          <!-- Indicador de progreso animado -->
+          <rect x="20" y="162" width="0" height="28" rx="4" fill="#F472B6" opacity="0.2" class="progress-bar"/>
+
+          <!-- Resultado -->
+          <text x="270" y="180" fill="#10B981" font-size="8" font-weight="600">→ done</text>
+        </svg>
+      </div>
+
+      <div class="comparison">
+        <div class="thread-card main">
+          <div class="thread-header">
+            <span class="thread-dot main-dot"></span>
+            <strong>Main Thread</strong>
+          </div>
+          <ul class="thread-list">
+            <li>✅ Acceso al DOM y a la UI</li>
+            <li>✅ Gestiona el Event Loop</li>
+            <li>✅ Responde a eventos del usuario</li>
+            <li>⚠️ Bloqueado = UI congelada</li>
+          </ul>
+        </div>
+
+        <div class="vs-badge">VS</div>
+
+        <div class="thread-card worker">
+          <div class="thread-header">
+            <span class="thread-dot worker-dot"></span>
+            <strong>Worker Thread</strong>
+          </div>
+          <ul class="thread-list">
+            <li>✅ Corre en paralelo real</li>
+            <li>✅ Ideal para tareas pesadas</li>
+            <li>✅ No bloquea la UI</li>
+            <li>🚫 Sin acceso al DOM</li>
+          </ul>
+        </div>
+
+        <div class="key-insight">
+          <span class="insight-icon">💡</span>
+          <p>Ambos hilos corren <strong>al mismo tiempo</strong>, en núcleos distintos del procesador.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="¡Dos hilos, dos carriles! El Main Thread conduce la UI y el Worker Thread hace el trabajo pesado en paralelo." mood="explaining" position="top-left" />
+</section>
+
+<style>
+  .slide-ww03 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 30%, #0C1A2E 0%, var(--color-bg) 65%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 880px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    text-align: center;
+    background: linear-gradient(135deg, var(--color-main-thread, #38BDF8), var(--color-worker-thread, #F472B6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .svg-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .svg-box svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .comparison {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .thread-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .thread-card.main  { border-left: 4px solid var(--color-main-thread, #38BDF8); }
+  .thread-card.worker { border-left: 4px solid var(--color-worker-thread, #F472B6); }
+
+  .thread-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .thread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .main-dot   { background: var(--color-main-thread, #38BDF8); }
+  .worker-dot { background: var(--color-worker-thread, #F472B6); }
+
+  .thread-header strong {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .thread-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .thread-list li {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .vs-badge {
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 800;
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .key-insight {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: #1a2a1a;
+    border: 1px solid #10B981;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .insight-icon {
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+  }
+
+  .key-insight p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .key-insight strong {
+    color: #10B981;
+  }
+
+  /* Animaciones SVG */
+  @keyframes block-appear {
+    from { opacity: 0; transform: scaleX(0); transform-origin: left; }
+    to   { opacity: 1; transform: scaleX(1); transform-origin: left; }
+  }
+
+  @keyframes progress-fill {
+    0%   { width: 0; }
+    80%  { width: 240px; }
+    100% { width: 240px; }
+  }
+
+  .mt-block { animation: block-appear 0.4s ease both; }
+  .wt-block { animation: block-appear 0.5s ease 0.2s both; }
+  .progress-bar { animation: progress-fill 4s linear infinite; }
+</style>

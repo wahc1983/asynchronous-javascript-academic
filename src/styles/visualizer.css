@@ -1,0 +1,108 @@
+/* ============================================
+   Visualizer — Animation Blocks
+   ============================================ */
+
+/* ── Bloque base ── */
+.anim-block {
+  background: var(--color-surface-2);
+  border: 1px solid var(--block-color, var(--color-accent));
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  box-shadow: 0 0 6px 0 color-mix(in srgb, var(--block-color, var(--color-accent)) 30%, transparent);
+  will-change: transform, opacity;
+  /* Contener texto largo */
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Tooltip nativo para ver el texto completo al hacer hover */
+  cursor: default;
+}
+
+/* ── Keyframes ── */
+
+@keyframes block-enter {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes block-exit {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes block-enter-queue {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes block-exit-queue {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes panel-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--block-color, var(--color-accent)) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px color-mix(in srgb, var(--block-color, var(--color-accent)) 50%, transparent);
+  }
+}
+
+/* ── Clases de estado ── */
+
+.anim-block--entering {
+  animation: block-enter var(--anim-duration) var(--anim-easing) both;
+}
+
+.anim-block--exiting {
+  animation: block-exit var(--anim-duration) var(--anim-easing) both;
+}
+
+.anim-block--moving {
+  transition: transform 300ms ease;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1023px) {
+  .anim-block {
+    font-size: calc(var(--text-xs) * 0.9);
+  }
+}
+
+/* Bloques en queues horizontales: ancho máximo para que el ellipsis funcione */
+.panel-blocks--horizontal .anim-block {
+  width: auto;
+  max-width: 120px;
+  flex-shrink: 0;
+}

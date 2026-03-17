@@ -1,0 +1,90 @@
+---
+import WorkersVisualizer from '../WorkersVisualizer.astro';
+import WorkersPlaybackControls from '../WorkersPlaybackControls.astro';
+import WorkersCodePlayground from '../WorkersCodePlayground.astro';
+import WorkersNarrator from '../WorkersNarrator.astro';
+import Mascot from '../Mascot.astro';
+---
+
+<section class="slide slide-ww06">
+  <div class="content">
+    <h2 class="title">Web Workers en acción</h2>
+    <p class="intro-text">
+      Selecciona un ejemplo y observa cómo el Main Thread y el Worker Thread
+      se comunican en paralelo.
+    </p>
+
+    <div class="visualizer-layout">
+      <!-- Columna izquierda: Visualizador + Controles -->
+      <div class="left-col">
+        <WorkersVisualizer />
+        <WorkersPlaybackControls />
+        <WorkersNarrator />
+      </div>
+
+      <!-- Columna derecha: Playground de código -->
+      <div class="right-col">
+        <WorkersCodePlayground />
+      </div>
+    </div>
+  </div>
+  <Mascot message="¡Observa los dos hilos trabajando en paralelo! El Main Thread sigue libre mientras el Worker hace el trabajo pesado." mood="excited" position="top-left" />
+</section>
+
+<style>
+  .slide-ww06 {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at 50% 20%, #1a0a2e 0%, var(--color-bg) 60%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 1200px;
+    padding: var(--space-6) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-main-thread, #38BDF8), var(--color-worker-thread, #F472B6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  .intro-text {
+    text-align: center;
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .visualizer-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .left-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+</style>

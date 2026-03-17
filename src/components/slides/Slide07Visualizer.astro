@@ -1,0 +1,61 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-visualizer">
+  <div class="content">
+    <h2 class="title">El Event Loop en acción</h2>
+    <p class="intro-text">
+      Ahora veamos cómo funciona todo junto. Selecciona un ejemplo y observa el flujo
+      de las tareas a través de cada componente.
+    </p>
+
+    <div class="visualizer-area">
+      <slot />
+    </div>
+  </div>
+  <Mascot message="¡Hora de verlo en vivo! Selecciona un ejemplo y observa cómo fluyen las tareas." mood="excited" />
+</section>
+
+<style>
+  .slide-visualizer {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at 50% 20%, #1a1a2e 0%, var(--color-bg) 60%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 1100px;
+    padding: var(--space-6) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-call-stack), var(--color-microtask-queue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  .intro-text {
+    text-align: center;
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .visualizer-area {
+    width: 100%;
+    flex: 1;
+  }
+</style>

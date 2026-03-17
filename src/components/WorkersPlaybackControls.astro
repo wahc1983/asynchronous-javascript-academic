@@ -1,0 +1,242 @@
+---
+// WorkersPlaybackControls.astro — controles de reproducción para la sección Web Workers
+---
+
+<div class="playback-controls" role="toolbar" aria-label="Controles de reproducción">
+  <!-- Botones de control -->
+  <div class="controls-buttons">
+    <button
+      id="ww-btn-play-pause"
+      class="ctrl-btn ctrl-btn--primary"
+      aria-label="Reproducir animación"
+    >
+      ▶
+    </button>
+
+    <button
+      id="ww-btn-reset"
+      class="ctrl-btn"
+      aria-label="Reiniciar animación"
+    >
+      ↺
+    </button>
+
+    <button
+      id="ww-btn-step"
+      class="ctrl-btn"
+      aria-label="Avanzar un paso"
+    >
+      ⏭
+    </button>
+  </div>
+
+  <!-- Slider de velocidad -->
+  <div class="speed-control">
+    <span class="speed-label" aria-hidden="true">Velocidad:</span>
+    <div class="speed-slider-wrapper">
+      <span class="speed-tick">Lento</span>
+      <input
+        id="ww-speed-slider"
+        type="range"
+        min="0"
+        max="2"
+        step="1"
+        value="1"
+        aria-label="Velocidad de animación"
+        class="speed-slider"
+      />
+      <span class="speed-tick">Rápido</span>
+    </div>
+    <span id="ww-speed-display" class="speed-display">Normal</span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const btnPlayPause = document.getElementById('ww-btn-play-pause') as HTMLButtonElement;
+    const btnReset = document.getElementById('ww-btn-reset') as HTMLButtonElement;
+    const btnStep = document.getElementById('ww-btn-step') as HTMLButtonElement;
+    const speedSlider = document.getElementById('ww-speed-slider') as HTMLInputElement;
+    const speedDisplay = document.getElementById('ww-speed-display') as HTMLSpanElement;
+
+    if (!btnPlayPause || !btnReset || !btnStep || !speedSlider || !speedDisplay) return;
+
+    let isPlaying = false;
+
+    const SPEED_LABELS: Record<string, string> = { '0': 'Lento', '1': 'Normal', '2': 'Rápido' };
+    const SPEED_VALUES: Record<string, 'slow' | 'normal' | 'fast'> = {
+      '0': 'slow',
+      '1': 'normal',
+      '2': 'fast',
+    };
+
+    function setPlayState(playing: boolean) {
+      isPlaying = playing;
+      btnPlayPause.textContent = playing ? '⏸' : '▶';
+      btnPlayPause.setAttribute(
+        'aria-label',
+        playing ? 'Pausar animación' : 'Reproducir animación'
+      );
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      if (isPlaying) {
+        setPlayState(false);
+        document.dispatchEvent(new CustomEvent('workers:pause'));
+      } else {
+        setPlayState(true);
+        document.dispatchEvent(new CustomEvent('workers:play'));
+      }
+    });
+
+    btnReset.addEventListener('click', () => {
+      setPlayState(false);
+      document.dispatchEvent(new CustomEvent('workers:reset'));
+    });
+
+    btnStep.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('workers:step-forward'));
+    });
+
+    speedSlider.addEventListener('input', () => {
+      const val = speedSlider.value;
+      speedDisplay.textContent = SPEED_LABELS[val] ?? 'Normal';
+      document.dispatchEvent(
+        new CustomEvent('workers:speed-change', {
+          detail: { speed: SPEED_VALUES[val] ?? 'normal' },
+        })
+      );
+    });
+
+    // Resetear botón Play cuando se emite workers:reset desde otro componente
+    document.addEventListener('workers:reset', () => {
+      setPlayState(false);
+    });
+  })();
+</script>
+
+<style>
+  .playback-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-6);
+    background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* ── Botones ── */
+  .controls-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .ctrl-btn {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    font-size: var(--text-base);
+    font-family: var(--font-sans);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  .ctrl-btn:hover {
+    background-color: var(--color-worker-thread, #F472B6);
+    color: var(--color-text-inverse);
+    border-color: var(--color-worker-thread, #F472B6);
+  }
+
+  .ctrl-btn--primary {
+    background-color: var(--color-worker-thread, #F472B6);
+    color: var(--color-text-inverse);
+    border-color: var(--color-worker-thread, #F472B6);
+    font-weight: 600;
+  }
+
+  .ctrl-btn--primary:hover {
+    filter: brightness(1.15);
+  }
+
+  /* ── Slider de velocidad ── */
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .speed-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .speed-slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .speed-tick {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .speed-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 7rem;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-surface-2);
+    outline: none;
+    cursor: pointer;
+    accent-color: var(--color-worker-thread, #F472B6);
+  }
+
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-worker-thread, #F472B6);
+    cursor: pointer;
+    border: 2px solid var(--color-bg);
+    transition: background 150ms ease;
+  }
+
+  .speed-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-worker-thread, #F472B6);
+    cursor: pointer;
+    border: 2px solid var(--color-bg);
+    transition: background 150ms ease;
+  }
+
+  .speed-slider::-webkit-slider-thumb:hover {
+    filter: brightness(1.15);
+  }
+
+  .speed-slider::-moz-range-thumb:hover {
+    filter: brightness(1.15);
+  }
+
+  .speed-display {
+    font-size: var(--text-sm);
+    color: var(--color-worker-thread, #F472B6);
+    min-width: 4ch;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

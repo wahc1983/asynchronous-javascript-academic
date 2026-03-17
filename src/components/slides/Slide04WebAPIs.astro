@@ -1,0 +1,225 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-web-apis">
+  <div class="content">
+    <h2 class="title">Web APIs del Navegador</h2>
+
+    <div class="main-grid">
+      <div class="browser-diagram" aria-label="Diagrama del navegador con sus servicios Web API">
+        <svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- Navegador (caja exterior) -->
+          <rect x="10" y="10" width="280" height="200" rx="10" fill="#0a1628" stroke="#10B981" stroke-width="2"/>
+          <!-- Barra del navegador -->
+          <rect x="10" y="10" width="280" height="28" rx="10" fill="#064E3B"/>
+          <circle cx="28" cy="24" r="5" fill="#EF4444" opacity="0.8"/>
+          <circle cx="44" cy="24" r="5" fill="#F59E0B" opacity="0.8"/>
+          <circle cx="60" cy="24" r="5" fill="#10B981" opacity="0.8"/>
+          <text x="150" y="28" text-anchor="middle" fill="#6EE7B7" font-size="9" font-weight="bold">NAVEGADOR</text>
+
+          <!-- setTimeout -->
+          <rect x="22" y="52" width="78" height="44" rx="6" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+          <text x="61" y="70" text-anchor="middle" fill="#6EE7B7" font-size="8" font-weight="bold">setTimeout</text>
+          <text x="61" y="84" text-anchor="middle" fill="#34D399" font-size="7">⏱ Temporizador</text>
+
+          <!-- fetch -->
+          <rect x="111" y="52" width="78" height="44" rx="6" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+          <text x="150" y="70" text-anchor="middle" fill="#6EE7B7" font-size="8" font-weight="bold">fetch / XHR</text>
+          <text x="150" y="84" text-anchor="middle" fill="#34D399" font-size="7">🌐 Red</text>
+
+          <!-- DOM Events -->
+          <rect x="200" y="52" width="78" height="44" rx="6" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+          <text x="239" y="70" text-anchor="middle" fill="#6EE7B7" font-size="8" font-weight="bold">DOM Events</text>
+          <text x="239" y="84" text-anchor="middle" fill="#34D399" font-size="7">🖱 Interacción</text>
+
+          <!-- setInterval -->
+          <rect x="22" y="110" width="78" height="44" rx="6" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+          <text x="61" y="128" text-anchor="middle" fill="#6EE7B7" font-size="8" font-weight="bold">setInterval</text>
+          <text x="61" y="142" text-anchor="middle" fill="#34D399" font-size="7">🔁 Repetición</text>
+
+          <!-- IndexedDB -->
+          <rect x="111" y="110" width="78" height="44" rx="6" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+          <text x="150" y="128" text-anchor="middle" fill="#6EE7B7" font-size="8" font-weight="bold">IndexedDB</text>
+          <text x="150" y="142" text-anchor="middle" fill="#34D399" font-size="7">💾 Almacenamiento</text>
+
+          <!-- Geolocation -->
+          <rect x="200" y="110" width="78" height="44" rx="6" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+          <text x="239" y="128" text-anchor="middle" fill="#6EE7B7" font-size="8" font-weight="bold">Geolocation</text>
+          <text x="239" y="142" text-anchor="middle" fill="#34D399" font-size="7">📍 Ubicación</text>
+
+          <!-- Flecha salida hacia callback queue -->
+          <path d="M150 165 L150 185" stroke="#10B981" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowGreen)"/>
+          <text x="150" y="198" text-anchor="middle" fill="#6EE7B7" font-size="8">→ Callback Queue</text>
+          <defs>
+            <marker id="arrowGreen" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+              <path d="M0,0 L3,6 L6,0 Z" fill="#10B981"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="explanation">
+        <div class="description-card">
+          <p>
+            El navegador nos presta <strong>"ayudantes"</strong> para tareas que toman tiempo:
+            temporizadores, peticiones de red, eventos del usuario.
+          </p>
+        </div>
+
+        <div class="key-point">
+          <span class="key-icon">💡</span>
+          <p>
+            Mientras el ayudante trabaja en segundo plano, JavaScript puede seguir ejecutando
+            otras instrucciones sin bloquearse.
+          </p>
+        </div>
+
+        <div class="flow-steps">
+          <div class="flow-step">
+            <span class="flow-num" style="background: var(--color-call-stack);">1</span>
+            <p>JS llama a <code>setTimeout(fn, 1000)</code></p>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step">
+            <span class="flow-num" style="background: var(--color-web-apis);">2</span>
+            <p>El navegador gestiona el temporizador</p>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step">
+            <span class="flow-num" style="background: var(--color-callback-queue);">3</span>
+            <p>Al terminar, el callback va a la cola</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="Las Web APIs trabajan en segundo plano para que yo no me bloquee. ¡Trabajo en equipo!" mood="happy" position="top-left" />
+</section>
+
+<style>
+  .slide-web-apis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 70% 40%, var(--color-web-apis-bg) 0%, var(--color-bg) 60%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 860px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--color-web-apis);
+    text-align: center;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .browser-diagram svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 16px #10B98133);
+  }
+
+  .explanation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .description-card {
+    background: var(--color-web-apis-bg);
+    border: 1px solid var(--color-web-apis);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .description-card strong {
+    color: var(--color-web-apis);
+  }
+
+  .key-point {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .key-icon {
+    font-size: var(--text-xl);
+    flex-shrink: 0;
+  }
+
+  .key-point p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .flow-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .flow-step p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .flow-step code {
+    color: var(--color-accent);
+    background: var(--color-surface-2);
+    padding: 1px 5px;
+    border-radius: var(--radius-sm);
+  }
+
+  .flow-arrow {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: 1;
+  }
+</style>

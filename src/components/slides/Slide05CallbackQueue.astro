@@ -1,0 +1,291 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-callback-queue">
+  <div class="content">
+    <h2 class="title">La Callback Queue <span class="subtitle-inline">(Cola de macrotareas)</span></h2>
+
+    <div class="main-grid">
+      <div class="queue-visual" aria-label="Diagrama de cola de callbacks esperando ser procesados">
+        <div class="queue-label">Callback Queue</div>
+
+        <div class="queue-container">
+          <!-- Entrada -->
+          <div class="queue-entry">
+            <span class="entry-icon">⬇️</span>
+            <span class="entry-text">Desde Web APIs</span>
+          </div>
+
+          <!-- Cola de callbacks -->
+          <div class="queue-track">
+            <div class="queue-item item-1">
+              <span class="item-icon">⏱</span>
+              <span>setTimeout cb</span>
+            </div>
+            <div class="queue-item item-2">
+              <span class="item-icon">🖱</span>
+              <span>click handler</span>
+            </div>
+            <div class="queue-item item-3">
+              <span class="item-icon">🔁</span>
+              <span>setInterval cb</span>
+            </div>
+          </div>
+
+          <!-- Salida -->
+          <div class="queue-exit">
+            <span class="exit-text">Al Call Stack</span>
+            <span class="exit-icon">➡️</span>
+          </div>
+        </div>
+
+        <svg class="event-loop-arrow" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="100" y="14" text-anchor="middle" fill="#F59E0B" font-size="9" font-weight="bold">
+            Solo cuando el Call Stack está vacío
+          </text>
+          <path d="M20 24 L180 24" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowOrange)"/>
+          <defs>
+            <marker id="arrowOrange" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#F59E0B"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="explanation">
+        <div class="description-card">
+          <p>
+            Cuando un ayudante del navegador termina su trabajo, pone el resultado
+            en esta cola para que JavaScript lo procese.
+          </p>
+        </div>
+
+        <div class="examples-list">
+          <h3 class="examples-title">Ejemplos de macrotareas</h3>
+          <div class="example-item">
+            <code>setTimeout(fn, delay)</code>
+            <span>Ejecuta fn después de delay ms</span>
+          </div>
+          <div class="example-item">
+            <code>setInterval(fn, delay)</code>
+            <span>Ejecuta fn repetidamente cada delay ms</span>
+          </div>
+          <div class="example-item">
+            <code>addEventListener('click', fn)</code>
+            <span>Ejecuta fn cuando el usuario hace click</span>
+          </div>
+          <div class="example-item">
+            <code>MessageChannel</code>
+            <span>Comunicación entre contextos</span>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <span class="rule-icon">⚠️</span>
+          <p>
+            El Event Loop solo mueve un callback de la cola al Call Stack
+            <strong>cuando el Call Stack está completamente vacío</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="Solo proceso callbacks cuando el Call Stack está vacío. ¡Paciencia!" mood="explaining" />
+</section>
+
+<style>
+  .slide-callback-queue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 70%, var(--color-callback-queue-bg) 0%, var(--color-bg) 60%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 860px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--color-callback-queue);
+    text-align: center;
+  }
+
+  .subtitle-inline {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  /* Queue visual */
+  .queue-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .queue-label {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-callback-queue);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .queue-container {
+    width: 100%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-callback-queue);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .queue-entry, .queue-exit {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .queue-exit {
+    justify-content: flex-end;
+  }
+
+  .queue-track {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    animation: fadeSlide 0.4s ease both;
+  }
+
+  .item-1 { background: #451A03; color: #FCD34D; border: 1px solid #F59E0B; animation-delay: 0.1s; }
+  .item-2 { background: #3d1a00; color: #FCA5A5; border: 1px solid #EF4444; animation-delay: 0.25s; }
+  .item-3 { background: #3a1a00; color: #FDE68A; border: 1px solid #D97706; animation-delay: 0.4s; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .item-icon {
+    font-size: var(--text-base);
+  }
+
+  .event-loop-arrow {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Explanation */
+  .explanation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .description-card {
+    background: var(--color-callback-queue-bg);
+    border: 1px solid var(--color-callback-queue);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .examples-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-2);
+  }
+
+  .examples-list {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .example-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .example-item:last-child {
+    border-bottom: none;
+  }
+
+  .example-item code {
+    color: var(--color-callback-queue);
+    font-size: var(--text-sm);
+  }
+
+  .example-item span {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .rule-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: #2a1500;
+    border: 1px solid var(--color-callback-queue);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .rule-icon {
+    font-size: var(--text-xl);
+    flex-shrink: 0;
+  }
+
+  .rule-card p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .rule-card strong {
+    color: var(--color-callback-queue);
+  }
+</style>

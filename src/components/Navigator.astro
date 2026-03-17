@@ -1,0 +1,166 @@
+---
+interface Props {
+  currentIndex: number;
+  total: number;
+}
+
+const { currentIndex, total } = Astro.props;
+const displayCurrent = currentIndex + 1;
+---
+
+<nav
+  class="navigator"
+  data-current-index={currentIndex}
+  data-total={total}
+  aria-label="Navegación de diapositivas"
+>
+  <button
+    id="nav-home"
+    class="nav-btn nav-btn--home"
+    aria-label="Ir a la pantalla de inicio"
+    disabled={currentIndex === 0}
+  >
+    ⌂ Inicio
+  </button>
+
+  <span class="nav-separator" aria-hidden="true">|</span>
+
+  <button
+    id="nav-prev"
+    class="nav-btn"
+    aria-label="Diapositiva anterior"
+    disabled={currentIndex === 0}
+  >
+    ← Anterior
+  </button>
+
+  <span class="nav-indicator" id="nav-indicator" aria-live="polite" aria-atomic="true">
+    {displayCurrent} / {total}
+  </span>
+
+  <button
+    id="nav-next"
+    class="nav-btn"
+    aria-label="Siguiente diapositiva"
+    disabled={currentIndex === total - 1}
+  >
+    Siguiente →
+  </button>
+</nav>
+
+<script>
+  (function () {
+    const nav = document.querySelector('.navigator') as HTMLElement;
+    if (!nav) return;
+
+    let currentIndex = parseInt(nav.dataset.currentIndex ?? '0', 10);
+    const total = parseInt(nav.dataset.total ?? '1', 10);
+
+    const prevBtn  = document.getElementById('nav-prev') as HTMLButtonElement;
+    const nextBtn  = document.getElementById('nav-next') as HTMLButtonElement;
+    const homeBtn  = document.getElementById('nav-home') as HTMLButtonElement;
+    const indicator = document.getElementById('nav-indicator') as HTMLSpanElement;
+
+    function updateUI() {
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === total - 1;
+      homeBtn.disabled = currentIndex === 0;
+      indicator.textContent = `${currentIndex + 1} / ${total}`;
+    }
+
+    function goTo(index: number) {
+      if (index < 0 || index >= total) return;
+      currentIndex = index;
+      updateUI();
+      document.dispatchEvent(
+        new CustomEvent('slide:change', { detail: { index: currentIndex } })
+      );
+    }
+
+    prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+    homeBtn.addEventListener('click', () => goTo(0));
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
+      if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+    });
+
+    document.addEventListener('slide:change', (e: Event) => {
+      const detail = (e as CustomEvent<{ index: number }>).detail;
+      if (detail.index !== currentIndex) {
+        currentIndex = detail.index;
+        updateUI();
+      }
+    });
+  })();
+</script>
+
+<style>
+  .navigator {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-8);
+    background-color: var(--color-surface);
+    background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--color-border);
+    z-index: 1000;
+  }
+
+  .nav-btn {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    transition: background-color 150ms ease, opacity 150ms ease;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background-color: var(--color-accent);
+    color: var(--color-text-inverse);
+    border-color: var(--color-accent);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .nav-btn--home {
+    font-size: var(--text-xs);
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+  }
+
+  .nav-btn--home:hover:not(:disabled) {
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    border-color: var(--color-text-muted);
+  }
+
+  .nav-separator {
+    color: var(--color-border);
+    font-size: var(--text-base);
+    user-select: none;
+  }
+
+  .nav-indicator {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    min-width: 5ch;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

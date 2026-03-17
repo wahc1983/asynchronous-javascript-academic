@@ -1,0 +1,118 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-intro">
+  <div class="content">
+    <div class="loop-icon" aria-hidden="true">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="50" stroke="url(#grad1)" stroke-width="6" stroke-linecap="round"
+          stroke-dasharray="260" stroke-dashoffset="0" class="loop-circle" />
+        <polygon points="60,18 72,36 48,36" fill="#38BDF8" class="loop-arrow" />
+        <defs>
+          <linearGradient id="grad1" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#38BDF8" />
+            <stop offset="100%" stop-color="#8B5CF6" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <h1 class="title">¿Qué es el Event Loop?</h1>
+    <p class="subtitle">El corazón de JavaScript</p>
+
+    <div class="body-text">
+      <p>
+        JavaScript es un lenguaje de programación que hace que las páginas web sean interactivas:
+        responde a tus clics, actualiza contenido sin recargar la página y se comunica con servidores
+        en segundo plano.
+      </p>
+      <p>
+        El <strong>Event Loop</strong> es el mecanismo que permite a JavaScript hacer múltiples cosas
+        "al mismo tiempo" aunque, por diseño, solo pueda ejecutar una instrucción a la vez.
+        Entenderlo es la clave para escribir código asíncrono predecible.
+      </p>
+    </div>
+  </div>
+  <Mascot message="¡Hola! Soy Loopy 👋 Te voy a guiar por el Event Loop. ¡Vamos!" mood="excited" />
+</section>
+
+<style>
+  .slide-intro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 60% 40%, #1a2a4a 0%, var(--color-bg) 70%);
+  }
+
+  .content {
+    text-align: center;
+    max-width: 700px;
+    padding: var(--space-12) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .loop-icon {
+    filter: drop-shadow(0 0 24px #38BDF855);
+  }
+
+  .loop-circle {
+    animation: spin 4s linear infinite;
+    transform-origin: 60px 60px;
+  }
+
+  .loop-arrow {
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  .title {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, #38BDF8, #8B5CF6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: var(--text-2xl);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .body-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: left;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+
+  .body-text p {
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .body-text strong {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,243 @@
+---
+// PlaybackControls.astro — barra de controles de reproducción
+---
+
+<div class="playback-controls" role="toolbar" aria-label="Controles de reproducción">
+  <!-- Botones de control -->
+  <div class="controls-buttons">
+    <button
+      id="btn-play-pause"
+      class="ctrl-btn ctrl-btn--primary"
+      aria-label="Reproducir animación"
+    >
+      ▶
+    </button>
+
+    <button
+      id="btn-reset"
+      class="ctrl-btn"
+      aria-label="Reiniciar animación"
+    >
+      ↺
+    </button>
+
+    <button
+      id="btn-step"
+      class="ctrl-btn"
+      aria-label="Avanzar un paso"
+    >
+      ⏭
+    </button>
+  </div>
+
+  <!-- Slider de velocidad -->
+  <div class="speed-control">
+    <span class="speed-label" aria-hidden="true">Velocidad:</span>
+    <div class="speed-slider-wrapper">
+      <span class="speed-tick">Lento</span>
+      <input
+        id="speed-slider"
+        type="range"
+        min="0"
+        max="2"
+        step="1"
+        value="1"
+        aria-label="Velocidad de animación"
+        class="speed-slider"
+      />
+      <span class="speed-tick">Rápido</span>
+    </div>
+    <span id="speed-display" class="speed-display">Normal</span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const btnPlayPause = document.getElementById('btn-play-pause') as HTMLButtonElement;
+    const btnReset = document.getElementById('btn-reset') as HTMLButtonElement;
+    const btnStep = document.getElementById('btn-step') as HTMLButtonElement;
+    const speedSlider = document.getElementById('speed-slider') as HTMLInputElement;
+    const speedDisplay = document.getElementById('speed-display') as HTMLSpanElement;
+
+    if (!btnPlayPause || !btnReset || !btnStep || !speedSlider || !speedDisplay) return;
+
+    let isPlaying = false;
+
+    const SPEED_LABELS: Record<string, string> = { '0': 'Lento', '1': 'Normal', '2': 'Rápido' };
+    const SPEED_VALUES: Record<string, 'slow' | 'normal' | 'fast'> = {
+      '0': 'slow',
+      '1': 'normal',
+      '2': 'fast',
+    };
+
+    function setPlayState(playing: boolean) {
+      isPlaying = playing;
+      btnPlayPause.textContent = playing ? '⏸' : '▶';
+      btnPlayPause.setAttribute(
+        'aria-label',
+        playing ? 'Pausar animación' : 'Reproducir animación'
+      );
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      if (isPlaying) {
+        setPlayState(false);
+        document.dispatchEvent(new CustomEvent('loop:pause'));
+      } else {
+        setPlayState(true);
+        document.dispatchEvent(new CustomEvent('loop:play'));
+      }
+    });
+
+    btnReset.addEventListener('click', () => {
+      setPlayState(false);
+      document.dispatchEvent(new CustomEvent('loop:reset'));
+    });
+
+    btnStep.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('loop:step-forward'));
+    });
+
+    speedSlider.addEventListener('input', () => {
+      const val = speedSlider.value;
+      speedDisplay.textContent = SPEED_LABELS[val] ?? 'Normal';
+      document.dispatchEvent(
+        new CustomEvent('loop:speed-change', {
+          detail: { speed: SPEED_VALUES[val] ?? 'normal' },
+        })
+      );
+    });
+
+    // Resetear botón Play cuando se emite loop:reset desde otro componente
+    document.addEventListener('loop:reset', () => {
+      setPlayState(false);
+    });
+  })();
+</script>
+
+<style>
+  .playback-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-6);
+    background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* ── Botones ── */
+  .controls-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .ctrl-btn {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    font-size: var(--text-base);
+    font-family: var(--font-sans);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  .ctrl-btn:hover {
+    background-color: var(--color-accent);
+    color: var(--color-text-inverse);
+    border-color: var(--color-accent);
+  }
+
+  .ctrl-btn--primary {
+    background-color: var(--color-accent);
+    color: var(--color-text-inverse);
+    border-color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .ctrl-btn--primary:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+  }
+
+  /* ── Slider de velocidad ── */
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .speed-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .speed-slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .speed-tick {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .speed-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 7rem;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-surface-2);
+    outline: none;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+  }
+
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    cursor: pointer;
+    border: 2px solid var(--color-bg);
+    transition: background 150ms ease;
+  }
+
+  .speed-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    cursor: pointer;
+    border: 2px solid var(--color-bg);
+    transition: background 150ms ease;
+  }
+
+  .speed-slider::-webkit-slider-thumb:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .speed-slider::-moz-range-thumb:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .speed-display {
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    min-width: 4ch;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

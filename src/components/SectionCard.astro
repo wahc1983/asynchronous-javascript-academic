@@ -1,0 +1,129 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  targetIndex: number;
+  accentColor: string;
+  ariaLabel: string;
+}
+
+const { title, description, targetIndex, accentColor, ariaLabel } = Astro.props;
+---
+
+<button
+  class="section-card"
+  aria-label={ariaLabel}
+  data-target-index={targetIndex}
+  style={`--card-accent: ${accentColor};`}
+>
+  <div class="section-card__glow" aria-hidden="true"></div>
+  <div class="section-card__content">
+    <h2 class="section-card__title">{title}</h2>
+    <p class="section-card__description">{description}</p>
+    <span class="section-card__cta" aria-hidden="true">Explorar →</span>
+  </div>
+</button>
+
+<style>
+  .section-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+    padding: var(--space-8);
+    background: var(--color-surface);
+    border: 2px solid var(--card-accent, var(--color-accent));
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-text);
+    overflow: hidden;
+    transition:
+      transform 200ms var(--anim-easing),
+      box-shadow 200ms var(--anim-easing),
+      border-color 200ms var(--anim-easing);
+  }
+
+  .section-card:hover,
+  .section-card:focus-visible {
+    transform: scale(1.04);
+    box-shadow: 0 0 24px 4px color-mix(in srgb, var(--card-accent, var(--color-accent)) 40%, transparent);
+    border-color: var(--card-accent, var(--color-accent));
+  }
+
+  .section-card:focus-visible {
+    outline: 2px solid var(--card-accent, var(--color-accent));
+    outline-offset: 3px;
+  }
+
+  .section-card:active {
+    transform: scale(0.98);
+  }
+
+  .section-card__glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      color-mix(in srgb, var(--card-accent, var(--color-accent)) 12%, transparent),
+      transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms var(--anim-easing);
+  }
+
+  .section-card:hover .section-card__glow,
+  .section-card:focus-visible .section-card__glow {
+    opacity: 1;
+  }
+
+  .section-card__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .section-card__title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--card-accent, var(--color-accent));
+    line-height: 1.2;
+  }
+
+  .section-card__description {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .section-card__cta {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--card-accent, var(--color-accent));
+    letter-spacing: 0.02em;
+    transition: letter-spacing 200ms var(--anim-easing);
+  }
+
+  .section-card:hover .section-card__cta,
+  .section-card:focus-visible .section-card__cta {
+    letter-spacing: 0.06em;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.section-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const index = Number(card.dataset.targetIndex);
+      card.dispatchEvent(
+        new CustomEvent('slide:change', {
+          detail: { index },
+          bubbles: true,
+        })
+      );
+    });
+  });
+</script>

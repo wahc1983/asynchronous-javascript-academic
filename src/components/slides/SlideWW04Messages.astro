@@ -1,0 +1,318 @@
+---
+import Mascot from '../Mascot.astro';
+---
+<section class="slide slide-ww04">
+  <div class="content">
+    <h2 class="title">Comunicación por mensajes</h2>
+
+    <div class="main-grid">
+      <div class="svg-box">
+        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"
+             aria-label="Diagrama bidireccional de mensajes entre Main Thread y Worker Thread">
+          <defs>
+            <marker id="ww04-arrow-blue" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#38BDF8"/>
+            </marker>
+            <marker id="ww04-arrow-pink" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#F472B6"/>
+            </marker>
+            <marker id="ww04-arrow-yellow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#FCD34D"/>
+            </marker>
+          </defs>
+
+          <!-- Main Thread box -->
+          <rect x="10" y="30" width="100" height="160" rx="8" fill="#0C2A3F" stroke="#38BDF8" stroke-width="2"/>
+          <text x="60" y="50" text-anchor="middle" fill="#38BDF8" font-size="9" font-weight="700">MAIN</text>
+          <text x="60" y="62" text-anchor="middle" fill="#38BDF8" font-size="9" font-weight="700">THREAD</text>
+
+          <!-- Código main -->
+          <rect x="18" y="72" width="84" height="14" rx="3" fill="#1D3461"/>
+          <text x="60" y="83" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">worker.postMessage</text>
+          <rect x="18" y="92" width="84" height="14" rx="3" fill="#1D3461"/>
+          <text x="60" y="103" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">onmessage = (e)</text>
+          <rect x="18" y="112" width="84" height="14" rx="3" fill="#1D3461"/>
+          <text x="60" y="123" text-anchor="middle" fill="#93C5FD" font-size="7" font-family="monospace">e.data → result</text>
+
+          <!-- Indicador DOM -->
+          <rect x="18" y="155" width="84" height="26" rx="4" fill="#064E3B" stroke="#10B981" stroke-width="1"/>
+          <text x="60" y="166" text-anchor="middle" fill="#6EE7B7" font-size="7">✅ DOM</text>
+          <text x="60" y="176" text-anchor="middle" fill="#6EE7B7" font-size="7">✅ UI Events</text>
+
+          <!-- Canal central -->
+          <rect x="118" y="30" width="84" height="160" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+          <text x="160" y="48" text-anchor="middle" fill="#64748B" font-size="8" font-weight="600">CANAL</text>
+
+          <!-- Flecha Main → Worker (postMessage) -->
+          <g class="msg-to-worker">
+            <rect x="126" y="68" width="68" height="22" rx="5" fill="#0C2A3F" stroke="#38BDF8" stroke-width="1.5"/>
+            <text x="160" y="83" text-anchor="middle" fill="#38BDF8" font-size="7" font-family="monospace">{"{ data }"}</text>
+            <path d="M194 79 L202 79" stroke="#38BDF8" stroke-width="1.5" marker-end="url(#ww04-arrow-blue)"/>
+          </g>
+          <text x="160" y="62" text-anchor="middle" fill="#38BDF8" font-size="7">postMessage →</text>
+
+          <!-- Flecha Worker → Main (message event) -->
+          <g class="msg-to-main">
+            <rect x="126" y="118" width="68" height="22" rx="5" fill="#3D0A24" stroke="#F472B6" stroke-width="1.5"/>
+            <text x="160" y="133" text-anchor="middle" fill="#F472B6" font-size="7" font-family="monospace">{"{ result }"}</text>
+            <path d="M126 129 L118 129" stroke="#F472B6" stroke-width="1.5" marker-end="url(#ww04-arrow-pink)"/>
+          </g>
+          <text x="160" y="114" text-anchor="middle" fill="#F472B6" font-size="7">← message event</text>
+
+          <!-- Structured clone label -->
+          <rect x="126" y="158" width="68" height="24" rx="4" fill="#3D2A00" stroke="#FCD34D" stroke-width="1"/>
+          <text x="160" y="169" text-anchor="middle" fill="#FCD34D" font-size="6.5" font-weight="600">structured</text>
+          <text x="160" y="178" text-anchor="middle" fill="#FCD34D" font-size="6.5" font-weight="600">clone 📋</text>
+
+          <!-- Worker Thread box -->
+          <rect x="210" y="30" width="100" height="160" rx="8" fill="#3D0A24" stroke="#F472B6" stroke-width="2"/>
+          <text x="260" y="50" text-anchor="middle" fill="#F472B6" font-size="9" font-weight="700">WORKER</text>
+          <text x="260" y="62" text-anchor="middle" fill="#F472B6" font-size="9" font-weight="700">THREAD</text>
+
+          <!-- Código worker -->
+          <rect x="218" y="72" width="84" height="14" rx="3" fill="#5a1035"/>
+          <text x="260" y="83" text-anchor="middle" fill="#FBCFE8" font-size="7" font-family="monospace">onmessage = (e)</text>
+          <rect x="218" y="92" width="84" height="14" rx="3" fill="#5a1035"/>
+          <text x="260" y="103" text-anchor="middle" fill="#FBCFE8" font-size="7" font-family="monospace">// procesar...</text>
+          <rect x="218" y="112" width="84" height="14" rx="3" fill="#5a1035"/>
+          <text x="260" y="123" text-anchor="middle" fill="#FBCFE8" font-size="7" font-family="monospace">postMessage(result)</text>
+
+          <!-- Indicador sin DOM -->
+          <rect x="218" y="155" width="84" height="26" rx="4" fill="#7F1D1D" stroke="#EF4444" stroke-width="1"/>
+          <text x="260" y="166" text-anchor="middle" fill="#FCA5A5" font-size="7">🚫 DOM</text>
+          <text x="260" y="176" text-anchor="middle" fill="#FCA5A5" font-size="7">🚫 window</text>
+        </svg>
+      </div>
+
+      <div class="explanation">
+        <div class="api-card">
+          <h3 class="api-title">La API de mensajes</h3>
+          <div class="api-items">
+            <div class="api-item">
+              <code class="api-code">worker.postMessage(data)</code>
+              <p>El hilo principal envía datos al worker.</p>
+            </div>
+            <div class="api-item">
+              <code class="api-code">self.postMessage(result)</code>
+              <p>El worker devuelve el resultado al hilo principal.</p>
+            </div>
+            <div class="api-item">
+              <code class="api-code">worker.onmessage = (e) =&gt; {}</code>
+              <p>Escucha la respuesta del worker. Los datos llegan en <code>e.data</code>.</p>
+            </div>
+            <div class="api-item error">
+              <code class="api-code error-code">worker.onerror = (e) =&gt; {}</code>
+              <p>Captura errores lanzados dentro del worker. <code>e.message</code> contiene el detalle.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="clone-card">
+          <div class="clone-header">
+            <span class="clone-icon">📋</span>
+            <strong>Structured Clone — datos por copia</strong>
+          </div>
+          <div class="clone-comparison">
+            <div class="clone-side bad">
+              <span class="clone-label">Por referencia ❌</span>
+              <p>Ambos hilos comparten el mismo objeto. Cambios en uno afectan al otro. <em>No es así en Workers.</em></p>
+            </div>
+            <div class="clone-side good">
+              <span class="clone-label">Por copia ✅</span>
+              <p>Se crea una copia independiente del dato. Cada hilo trabaja con su propia versión. Sin efectos secundarios.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Mascot message="postMessage es el teléfono entre hilos. Y structured clone es como enviar una fotocopia, no el original." mood="explaining" position="top-left" />
+</section>
+
+<style>
+  .slide-ww04 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 50%, #0a1a2a 0%, var(--color-bg) 65%);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 900px;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    text-align: center;
+    background: linear-gradient(135deg, var(--color-main-thread, #38BDF8), #FCD34D, var(--color-worker-thread, #F472B6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .svg-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .svg-box svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .explanation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .api-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .api-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+  }
+
+  .api-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .api-item {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-3);
+  }
+
+  .api-item.error {
+    border-left-color: #EF4444;
+  }
+
+  .api-code {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    background: var(--color-surface-2);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+  }
+
+  .error-code {
+    color: #EF4444;
+  }
+
+  .api-item p {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .api-item p code {
+    color: var(--color-accent);
+    background: var(--color-surface-2);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: var(--text-xs);
+  }
+
+  .clone-card {
+    background: var(--color-surface);
+    border: 1px solid #FCD34D;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .clone-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .clone-icon {
+    font-size: var(--text-lg);
+  }
+
+  .clone-header strong {
+    font-size: var(--text-sm);
+    color: #FCD34D;
+  }
+
+  .clone-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .clone-side {
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+  }
+
+  .clone-side.bad  { background: #1a0a0a; border: 1px solid #7F1D1D; }
+  .clone-side.good { background: #064E3B; border: 1px solid #10B981; }
+
+  .clone-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+  }
+
+  .clone-side.bad  .clone-label { color: #FCA5A5; }
+  .clone-side.good .clone-label { color: #6EE7B7; }
+
+  .clone-side p {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .clone-side p em {
+    color: #FCA5A5;
+    font-style: normal;
+  }
+
+  /* Animaciones SVG */
+  @keyframes msg-right {
+    0%, 20%  { transform: translateX(0);    opacity: 0; }
+    30%, 70% { transform: translateX(0);    opacity: 1; }
+    80%      { transform: translateX(10px); opacity: 0; }
+    100%     { transform: translateX(0);    opacity: 0; }
+  }
+
+  @keyframes msg-left {
+    0%, 50%  { transform: translateX(0);     opacity: 0; }
+    60%, 90% { transform: translateX(0);     opacity: 1; }
+    95%      { transform: translateX(-10px); opacity: 0; }
+    100%     { transform: translateX(0);     opacity: 0; }
+  }
+
+  .msg-to-worker { animation: msg-right 4s ease-in-out infinite; }
+  .msg-to-main   { animation: msg-left  4s ease-in-out infinite; }
+</style>
